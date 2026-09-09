@@ -27,6 +27,9 @@ const HC_ICON_SPRITE = `
 <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="12" y1="11" x2="12" y2="16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="7.8" r="1.05" fill="currentColor"/></symbol>
 <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.2A8 8 0 1 1 10.8 4.6a6.4 6.4 0 0 0 8.7 9.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></symbol>
 <symbol id="i-droplet" viewBox="0 0 24 24"><path d="M12 3.4C9.2 7.6 6.6 11.1 6.6 14.3a5.4 5.4 0 0 0 10.8 0C17.4 11.1 14.8 7.6 12 3.4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+<symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .5-7.97 5.5 5.5 0 0 0-10.6 1.5A3.5 3.5 0 0 0 7 18z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+<symbol id="i-generator" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><polygon points="13,9.3 9.3,14.2 11.8,14.2 10.8,17.7 14.9,13 12.1,13" fill="currentColor"/></symbol>
+<symbol id="i-away" viewBox="0 0 24 24"><path d="M9 4.5H6A1.5 1.5 0 0 0 4.5 6v12A1.5 1.5 0 0 0 6 19.5h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M13 8.2l3.8 3.8-3.8 3.8M16.6 12H9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 </defs>
 </svg>`;
 
