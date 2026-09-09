@@ -3,6 +3,21 @@
   let currentFilter = 'all';
   let editingId = null;
 
+  const HC_PANTRY_HEADER = ['id', 'name', 'category', 'quantity', 'unit', 'lowThreshold', 'expiresAt'];
+  function toPantryRow(i) { return [i.id, i.name, i.category, i.quantity, i.unit, i.lowThreshold, i.expiresAt || '']; }
+  function parsePantryRow(r) {
+    if (!r[1]) return null;
+    return {
+      id: r[0] || ('p' + Date.now() + Math.random().toString(36).slice(2, 7)),
+      name: r[1],
+      category: r[2] || 'groceries',
+      quantity: Number(r[3]) || 0,
+      unit: r[4] || '',
+      lowThreshold: Number(r[5]) || 0,
+      expiresAt: r[6] || null
+    };
+  }
+
   /* ---------------------------- Sheets connection UI ---------------------------- */
 
   const shStatus = document.getElementById('sh-status');
@@ -28,9 +43,9 @@
     if (err) { setSheetStatus('error', typeof err === 'string' ? err : 'Connection failed'); return; }
     setSheetStatus('busy', 'Syncing…');
     try {
-      const remote = await hcSheetsFetchAll();
+      const remote = await hcSheetsFetchTab('Pantry', 'A1:G1000', parsePantryRow);
       if (remote.length === 0) {
-        await hcSheetsPushAll(hcLoadPantry()); // empty sheet — seed it from what's local
+        await hcSheetsPushTab('Pantry', 'A1:G1000', HC_PANTRY_HEADER, hcLoadPantry().map(toPantryRow)); // empty sheet — seed it from what's local
       } else {
         hcSavePantry(remote); // sheet has data — it wins
       }
@@ -51,7 +66,7 @@
     hcSavePantry(list);
     if (hcSheetsConnected()) {
       setSheetStatus('busy', 'Syncing…');
-      hcSheetsPushAll(list)
+      hcSheetsPushTab('Pantry', 'A1:G1000', HC_PANTRY_HEADER, list.map(toPantryRow))
         .then(() => setSheetStatus('ok', 'Synced ' + new Date().toLocaleTimeString()))
         .catch(e => setSheetStatus('error', e.message));
     }
