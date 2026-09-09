@@ -178,3 +178,140 @@ function hcDemoClimate() {
 async function hcGetClimate() {
   return hcDemoClimate();
 }
+
+/* ---------------------------- weather (real, no key needed) ---------------------------- */
+// Open-Meteo is free, keyless, and CORS-enabled, so this calls it straight
+// from the browser — no proxy needed, unlike everything else on this site.
+// Coordinates default to Beirut; change them if the house is elsewhere.
+
+const HC_WEATHER_LAT = 33.8938;
+const HC_WEATHER_LON = 35.5018;
+
+const HC_WEATHER_CODES = {
+  0: { label: 'Clear sky', icon: 'i-sun', solar: 'good' },
+  1: { label: 'Mainly clear', icon: 'i-sun', solar: 'good' },
+  2: { label: 'Partly cloudy', icon: 'i-cloud', solar: 'fair' },
+  3: { label: 'Overcast', icon: 'i-cloud', solar: 'poor' },
+  45: { label: 'Fog', icon: 'i-cloud', solar: 'poor' },
+  48: { label: 'Fog', icon: 'i-cloud', solar: 'poor' },
+  51: { label: 'Light drizzle', icon: 'i-droplet', solar: 'poor' },
+  53: { label: 'Drizzle', icon: 'i-droplet', solar: 'poor' },
+  55: { label: 'Dense drizzle', icon: 'i-droplet', solar: 'poor' },
+  61: { label: 'Light rain', icon: 'i-droplet', solar: 'poor' },
+  63: { label: 'Rain', icon: 'i-droplet', solar: 'poor' },
+  65: { label: 'Heavy rain', icon: 'i-droplet', solar: 'poor' },
+  71: { label: 'Snow', icon: 'i-snow', solar: 'poor' },
+  73: { label: 'Snow', icon: 'i-snow', solar: 'poor' },
+  75: { label: 'Heavy snow', icon: 'i-snow', solar: 'poor' },
+  80: { label: 'Rain showers', icon: 'i-droplet', solar: 'poor' },
+  81: { label: 'Rain showers', icon: 'i-droplet', solar: 'poor' },
+  82: { label: 'Violent showers', icon: 'i-droplet', solar: 'poor' },
+  95: { label: 'Thunderstorm', icon: 'i-bolt', solar: 'poor' }
+};
+
+const HC_SOLAR_OUTLOOK = {
+  good: 'Clear skies — strong solar output expected today.',
+  fair: 'Some cloud cover — solar output may dip on and off.',
+  poor: 'Overcast or wet — expect reduced solar generation today.'
+};
+
+async function hcGetWeather() {
+  try {
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${HC_WEATHER_LAT}&longitude=${HC_WEATHER_LON}&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=auto`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('weather service unavailable');
+    const data = await res.json();
+    const code = data.current.weather_code;
+    const meta = HC_WEATHER_CODES[code] || { label: 'Mixed conditions', icon: 'i-cloud', solar: 'fair' };
+    return {
+      ok: true,
+      temp: Math.round(data.current.temperature_2m),
+      high: Math.round(data.daily.temperature_2m_max[0]),
+      low: Math.round(data.daily.temperature_2m_min[0]),
+      label: meta.label,
+      icon: meta.icon,
+      outlook: HC_SOLAR_OUTLOOK[meta.solar]
+    };
+  } catch (err) {
+    return { ok: false, message: err.message };
+  }
+}
+
+/* ---------------------------- utilities (demo) ---------------------------- */
+// Generator and water-tank monitoring aren't tied to a specific platform
+// yet, so these stay demo-only until you've picked a real sensor source
+// (a smart plug sensing genset current draw, a Tuya tank-level sensor, etc).
+
+function hcDemoUtilities() {
+  const now = new Date();
+  const hour = now.getHours() + now.getMinutes() / 60;
+  const gridDown = hour % 6 < 1.2; // demo: a rotating ~1hr outage window
+  return {
+    generator: {
+      running: gridDown,
+      fuelPct: Math.max(8, Math.round(78 - (now.getDate() % 28) * 1.6)),
+      runtimeTodayMin: gridDown ? Math.round((hour % 6) * 60) : 0
+    },
+    waterTank: {
+      pct: Math.max(12, Math.round(64 + Math.sin(hour / 5) * 20))
+    }
+  };
+}
+
+/* ---------------------------- activity log ---------------------------- */
+
+const HC_ACTIVITY_KEY = 'hc_activity_v1';
+
+function hcRelativeTime(iso) {
+  const mins = Math.max(0, Math.round((Date.now() - new Date(iso).getTime()) / 60000));
+  if (mins < 1) return 'just now';
+  if (mins < 60) return mins + 'm ago';
+  const hours = Math.round(mins / 60);
+  if (hours < 24) return hours + 'h ago';
+  return Math.round(hours / 24) + 'd ago';
+}
+
+function hcGetActivity() {
+  try {
+    const list = JSON.parse(localStorage.getItem(HC_ACTIVITY_KEY) || '[]');
+    if (list.length) return list;
+  } catch (e) { /* fall through to seed */ }
+
+  // Seed a few plausible entries on first visit so the feed isn't empty.
+  const now = Date.now();
+  const seed = [
+    { message: 'Robot vacuum finished cleaning', at: new Date(now - 2 * 3600000).toISOString() },
+    { message: 'Kitchen Light turned off', at: new Date(now - 3.2 * 3600000).toISOString() },
+    { message: 'Living Room AC turned on — 23°', at: new Date(now - 5.5 * 3600000).toISOString() }
+  ];
+  localStorage.setItem(HC_ACTIVITY_KEY, JSON.stringify(seed));
+  return seed;
+}
+
+function hcLogActivity(message) {
+  let list = [];
+  try { list = JSON.parse(localStorage.getItem(HC_ACTIVITY_KEY) || '[]'); } catch (e) { /* noop */ }
+  list.unshift({ message, at: new Date().toISOString() });
+  localStorage.setItem(HC_ACTIVITY_KEY, JSON.stringify(list.slice(0, 20)));
+}
+
+/* ---------------------------- scenes ---------------------------- */
+
+async function hcApplyScene(sceneId) {
+  const scene = window.HC_SCENES.find(s => s.id === sceneId);
+  if (!scene) return;
+  let changed = 0;
+  const sends = [];
+  window.HC_DEVICES.forEach(d => {
+    const patch = scene.ruleFor(d);
+    if (!patch) return;
+    const isNoop = Object.entries(patch).every(([k, v]) => d.state[k] === v);
+    if (isNoop) return;
+    Object.assign(d.state, patch);
+    changed++;
+    sends.push(hcSendDeviceCommand(d, patch));
+  });
+  hcLogActivity(`${scene.label} scene applied — ${changed} device${changed === 1 ? '' : 's'} changed`);
+  await Promise.all(sends);
+  return changed;
+}
