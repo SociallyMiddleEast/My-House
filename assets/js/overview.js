@@ -37,6 +37,14 @@
   document.getElementById('ov-pantry-total').textContent = pantry.total;
   document.getElementById('ov-pantry-expiring').textContent = pantry.expiring;
 
+  // Expenses summary
+  const exp = hcExpenseSummary();
+  document.getElementById('ov-exp-total').textContent = '$' + exp.total.toFixed(0);
+  document.getElementById('ov-exp-count').textContent = exp.count;
+  document.getElementById('ov-exp-delta').textContent = exp.lastTotal > 0
+    ? (exp.total >= exp.lastTotal ? '+' : '') + Math.round(((exp.total - exp.lastTotal) / exp.lastTotal) * 100) + '%'
+    : '—';
+
   // Platform badges
   const settings = hcLoadSettings();
   const badgeWrap = document.getElementById('ov-platform-badges');
