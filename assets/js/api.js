@@ -427,3 +427,50 @@ function hcExpenseSummary() {
     entries: list.length
   };
 }
+
+/* ---------------------------- custom gauges (self-service, from Settings) ---------------------------- */
+
+const HC_GAUGES_KEY = 'hc_custom_gauges_v1';
+
+const HC_GAUGE_ICONS = ['i-sun', 'i-droplet', 'i-cloud', 'i-snow', 'i-bulb', 'i-battery', 'i-tower', 'i-generator', 'i-gas', 'i-barrel', 'i-vacuum', 'i-wallet', 'i-basket', 'i-house', 'i-outlet'];
+const HC_GAUGE_COLORS = [
+  { label: 'Amber', value: 'var(--amber)' },
+  { label: 'Teal', value: 'var(--teal)' },
+  { label: 'Green', value: 'var(--good)' },
+  { label: 'Indigo', value: 'var(--indigo)' },
+  { label: 'Violet', value: '#8862D6' },
+  { label: 'Rust', value: '#D97A4A' },
+  { label: 'Blue', value: '#3B8FC4' },
+  { label: 'Gold', value: '#C9A227' },
+  { label: 'Brown', value: '#8B5E34' }
+];
+
+function hcLoadGauges() {
+  try { return JSON.parse(localStorage.getItem(HC_GAUGES_KEY) || '[]'); }
+  catch (e) { return []; }
+}
+
+function hcSaveGauges(list) {
+  localStorage.setItem(HC_GAUGES_KEY, JSON.stringify(list));
+}
+
+function hcAddGauge(gauge) {
+  const list = hcLoadGauges();
+  list.push({ id: 'g' + Date.now(), ...gauge });
+  hcSaveGauges(list);
+  return list;
+}
+
+function hcUpdateGauge(id, patch) {
+  const list = hcLoadGauges();
+  const g = list.find(i => i.id === id);
+  if (g) Object.assign(g, patch);
+  hcSaveGauges(list);
+  return list;
+}
+
+function hcDeleteGauge(id) {
+  const list = hcLoadGauges().filter(i => i.id !== id);
+  hcSaveGauges(list);
+  return list;
+}
