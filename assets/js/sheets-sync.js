@@ -1,18 +1,14 @@
 /* ==========================================================================
-   Google Sheets sync for Pantry. Entirely client-side: Google Identity
-   Services hands the browser a short-lived OAuth access token, and that
-   token calls the Sheets API directly (CORS-enabled by Google). No backend
-   proxy involved, unlike DeyeCloud/Tuya/etc — and unlike those, the access
-   token is kept in memory only, never written to localStorage.
-
-   Sheet layout expected (first tab, no header-name required — a bare range
-   defaults to the first sheet): row 1 is headers, then one row per item:
-     id | name | category | quantity | unit | lowThreshold | expiresAt
+   Google Sheets sync — shared by Pantry and Expenses. Entirely client-side:
+   Google Identity Services hands the browser a short-lived OAuth access
+   token, and that token calls the Sheets API directly (CORS-enabled by
+   Google). No backend proxy involved, unlike DeyeCloud/Tuya/etc — and
+   unlike those, the access token is kept in memory only, never written to
+   localStorage. One Google connection (one Client ID, one Sheet ID) is
+   shared by both features; each writes to its own named tab in that Sheet.
    ========================================================================== */
 
-const HC_SHEET_SETTINGS_KEY = 'hc_pantry_sheet_v1';
-const HC_SHEET_RANGE = 'A1:G1000';
-const HC_SHEET_HEADER = ['id', 'name', 'category', 'quantity', 'unit', 'lowThreshold', 'expiresAt'];
+const HC_SHEET_SETTINGS_KEY = 'hc_pantry_sheet_v1'; // name predates Expenses — kept for backward compatibility
 const HC_SHEET_SCOPE = 'https://www.googleapis.com/auth/spreadsheets';
 
 let hcSheetToken = null;   // in-memory only — never persisted
@@ -72,39 +68,34 @@ function hcTrySilentConnect(onToken) {
   client.requestAccessToken({ prompt: '' });
 }
 
-function hcSheetsUrl(suffix) {
+/* ---------------------------- generic tab read/write ---------------------------- */
+// tabName must match an existing tab in the Sheet exactly (case-sensitive).
+// range is the cell range within that tab, e.g. 'A1:G1000'.
+
+function hcSheetsRangeUrl(tabName, range, suffix) {
   const s = hcLoadSheetSettings();
-  return `https://sheets.googleapis.com/v4/spreadsheets/${s.sheetId}/values/${encodeURIComponent(HC_SHEET_RANGE)}${suffix || ''}`;
+  const full = `${tabName}!${range}`;
+  return `https://sheets.googleapis.com/v4/spreadsheets/${s.sheetId}/values/${encodeURIComponent(full)}${suffix || ''}`;
 }
 
-async function hcSheetsFetchAll() {
+async function hcSheetsFetchTab(tabName, range, parseRow) {
   if (!hcSheetToken) throw new Error('Not connected to Google.');
-  const res = await fetch(hcSheetsUrl(), { headers: { Authorization: `Bearer ${hcSheetToken}` } });
+  const res = await fetch(hcSheetsRangeUrl(tabName, range), { headers: { Authorization: `Bearer ${hcSheetToken}` } });
   if (res.status === 401) { hcSheetToken = null; throw new Error('Google session expired — reconnect.'); }
-  if (!res.ok) throw new Error(`Sheets read failed (${res.status})`);
+  if (!res.ok) throw new Error(`Sheets read failed (${res.status}) — make sure a tab named "${tabName}" exists.`);
   const data = await res.json();
   const rows = (data.values || []).slice(1); // skip header row
-  return rows
-    .map(r => ({
-      id: r[0] || ('p' + Date.now() + Math.random().toString(36).slice(2, 7)),
-      name: r[1] || '',
-      category: r[2] || 'groceries',
-      quantity: Number(r[3]) || 0,
-      unit: r[4] || '',
-      lowThreshold: Number(r[5]) || 0,
-      expiresAt: r[6] || null
-    }))
-    .filter(i => i.name);
+  return rows.map(parseRow).filter(Boolean);
 }
 
-async function hcSheetsPushAll(list) {
+async function hcSheetsPushTab(tabName, range, header, rowsData) {
   if (!hcSheetToken) throw new Error('Not connected to Google.');
-  const values = [HC_SHEET_HEADER, ...list.map(i => [i.id, i.name, i.category, i.quantity, i.unit, i.lowThreshold, i.expiresAt || ''])];
-  const res = await fetch(hcSheetsUrl('?valueInputOption=USER_ENTERED'), {
+  const values = [header, ...rowsData];
+  const res = await fetch(hcSheetsRangeUrl(tabName, range, '?valueInputOption=USER_ENTERED'), {
     method: 'PUT',
     headers: { Authorization: `Bearer ${hcSheetToken}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ range: HC_SHEET_RANGE, values })
+    body: JSON.stringify({ range: `${tabName}!${range}`, values })
   });
   if (res.status === 401) { hcSheetToken = null; throw new Error('Google session expired — reconnect.'); }
-  if (!res.ok) throw new Error(`Sheets write failed (${res.status})`);
+  if (!res.ok) throw new Error(`Sheets write failed (${res.status}) — make sure a tab named "${tabName}" exists.`);
 }
