@@ -504,6 +504,38 @@ label.field .hint {
 .device-tile .dt-note { font-size: 11px; color: var(--text-faint); display: flex; gap: 5px; align-items: flex-start; }
 .device-tile .dt-note svg { width: 12px; height: 12px; flex-shrink: 0; margin-top: 1px; color: var(--text-faint); }
 
+/* ---------------------------------- climate tiles --------------------------------- */
+
+.climate-tile {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--teal);
+  border-radius: var(--radius);
+  padding: 14px 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.climate-tile.vacuum-tile { border-left-color: #8862D6; }
+
+.climate-head { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text-muted); }
+.climate-head svg { width: 14px; height: 14px; color: var(--teal); flex-shrink: 0; }
+.vacuum-tile .climate-head svg { color: #8862D6; }
+
+.climate-value { font-family: var(--font-display); font-size: 25px; font-weight: 600; line-height: 1; }
+.climate-unit { font-size: 14px; font-weight: 400; color: var(--text-muted); margin-left: 1px; }
+
+.climate-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.climate-foot .spark { width: 56px; height: 18px; flex-shrink: 0; }
+.climate-foot .spark path { fill: none; stroke: var(--teal); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0.8; }
+.climate-delta { font-size: 11px; color: var(--text-faint); font-family: var(--font-mono); white-space: nowrap; }
+
+.vacuum-bar { height: 5px; border-radius: 100px; background: var(--line-soft); overflow: hidden; }
+.vacuum-bar-fill { height: 100%; background: #8862D6; border-radius: 100px; transition: width 1s linear; }
+.vacuum-note { font-size: 11px; color: var(--text-faint); line-height: 1.4; }
+
 /* ---------------------------------- reusable layout --------------------------------- */
 
 .hero-grid {
