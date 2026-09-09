@@ -25,6 +25,7 @@ const HC_ICON_SPRITE = `
 <symbol id="i-outlet" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><line x1="10" y1="9" x2="10" y2="13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="14" y1="9" x2="14" y2="13" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M10 15.5a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.4"/></symbol>
 <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="7.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-dasharray="2.2 2.4"/></symbol>
 <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="12" y1="11" x2="12" y2="16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="7.8" r="1.05" fill="currentColor"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.2A8 8 0 1 1 10.8 4.6a6.4 6.4 0 0 0 8.7 9.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></symbol>
 </defs>
 </svg>`;
 
@@ -34,6 +35,26 @@ const HC_NAV_ITEMS = [
   { id: 'house-control', href: 'house-control.html',  label: 'House control',  icon: 'i-house', accent: 'teal' },
   { id: 'connections',   href: 'connections.html',    label: 'Connections',    icon: 'i-plug' }
 ];
+
+function hcCurrentTheme() {
+  return document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+}
+
+function hcSetTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  hcSaveSettings({ theme });
+  document.querySelectorAll('.theme-toggle use').forEach(el => el.setAttribute('href', theme === 'dark' ? '#i-sun' : '#i-moon'));
+  document.querySelectorAll('.theme-toggle').forEach(btn => btn.setAttribute('aria-label', `Switch to ${theme === 'dark' ? 'light' : 'dark'} theme`));
+}
+
+function hcToggleTheme() { hcSetTheme(hcCurrentTheme() === 'dark' ? 'light' : 'dark'); }
+
+function hcThemeToggleMarkup(id) {
+  const theme = hcCurrentTheme();
+  return `<button class="theme-toggle" id="${id}" aria-label="Switch to ${theme === 'dark' ? 'light' : 'dark'} theme">
+    <svg><use href="#${theme === 'dark' ? 'i-sun' : 'i-moon'}"/></svg>
+  </button>`;
+}
 
 function hcRenderSidebar(active) {
   const items = HC_NAV_ITEMS.map(item => {
@@ -63,6 +84,7 @@ function hcRenderSidebar(active) {
     <nav class="nav">${items}</nav>
     <div class="sidebar-foot">
       <div class="grid-chip"><span class="dot ${dotClass}"></span>${label}</div>
+      ${hcThemeToggleMarkup('theme-toggle-desktop')}
     </div>`;
 }
 
@@ -73,16 +95,25 @@ function hcRenderTopbar(active) {
       <svg><use href="#i-menu"/></svg>
     </button>
     <div class="brand-name" style="font-size:14px">${current ? current.label : 'Home Control'}</div>
-    <div style="width:34px"></div>`;
+    ${hcThemeToggleMarkup('theme-toggle-mobile')}`;
 }
 
 (function hcInitShell() {
   document.body.insertAdjacentHTML('afterbegin', HC_ICON_SPRITE);
+
+  if (!document.documentElement.getAttribute('data-theme')) {
+    const stored = hcLoadSettings().theme;
+    const fallback = window.matchMedia && matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', stored || fallback);
+  }
+
   const active = document.body.dataset.page || 'overview';
   const sidebarMount = document.getElementById('sidebar-mount');
   const topbarMount = document.getElementById('topbar-mount');
   if (sidebarMount) sidebarMount.innerHTML = hcRenderSidebar(active);
   if (topbarMount) topbarMount.innerHTML = hcRenderTopbar(active);
+
+  document.querySelectorAll('.theme-toggle').forEach(btn => btn.addEventListener('click', hcToggleTheme));
 
   const toggle = document.getElementById('hc-nav-toggle');
   const shell = document.getElementById('shell');
