@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Energy — Home Control</title>
+<script>(function(){try{var s=JSON.parse(localStorage.getItem('hc_settings_v1')||'{}');var t=s.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}try{var a=JSON.parse(localStorage.getItem('hc_auth_v1')||'null');if(a&&a.enabled){var ok=sessionStorage.getItem('hc_session_ok')||localStorage.getItem('hc_session_ok');if(ok!=='1'){document.documentElement.setAttribute('data-authgate','locked');}}}catch(e){}})();</script>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body data-page="energy">
@@ -19,7 +20,7 @@
       </div>
       <div class="page-actions">
         <button class="btn small" id="nrg-refresh"><svg><use href="#i-refresh"/></svg>Refresh</button>
-        <a class="btn small primary" href="connections.html" id="nrg-connect-btn"><svg><use href="#i-plug"/></svg>Connect DeyeCloud</a>
+        <a class="btn small primary" href="settings.html" id="nrg-connect-btn"><svg><use href="#i-plug"/></svg>Connect DeyeCloud</a>
       </div>
     </div>
 
@@ -119,6 +120,7 @@
 <script src="assets/js/config.js"></script>
 <script src="assets/js/api.js"></script>
 <script src="assets/js/nav.js"></script>
+<script src="assets/js/auth.js"></script>
 <script src="assets/js/energy.js"></script>
 </body>
 </html>
