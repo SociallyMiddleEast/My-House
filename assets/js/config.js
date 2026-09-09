@@ -8,6 +8,7 @@ const HC_STORE_KEY = 'hc_settings_v1';
 
 const HC_DEFAULTS = {
   mode: 'demo',            // 'demo' | 'live'
+  theme: null,              // 'light' | 'dark' | null (null = follow system preference)
   proxyUrl: '',            // e.g. https://your-proxy.onrender.com
   proxyKey: '',            // shared secret sent as x-proxy-key
   services: {               // which integrations are considered "on"
