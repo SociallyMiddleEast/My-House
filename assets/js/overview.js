@@ -33,15 +33,45 @@
 
   // Platform badges
   const settings = hcLoadSettings();
-  const wrap = document.getElementById('ov-platform-badges');
-  wrap.innerHTML = Object.entries(window.HC_PLATFORMS).map(([key, p]) => {
+  const badgeWrap = document.getElementById('ov-platform-badges');
+  badgeWrap.innerHTML = Object.entries(window.HC_PLATFORMS).map(([key, p]) => {
     const enabled = settings.services[key];
     const status = p.manual ? 'no public API' : (hcIsLive() && enabled ? 'live' : 'demo');
     const dotClass = p.manual ? 'neutral' : (hcIsLive() && enabled ? 'good' : 'neutral');
     return `<span class="badge"><span class="dot ${dotClass}" style="background:${p.manual ? '' : p.color}"></span>${p.label} (${status})</span>`;
   }).join('');
 
-  // Home conditions
+  // ---- Quick scenes ----
+  function renderScenes() {
+    document.getElementById('scenes-mount').innerHTML = window.HC_SCENES.map(s => `
+      <button class="scene-card" data-scene="${s.id}">
+        <span class="scene-icon"><svg><use href="#${s.icon}"/></svg></span>
+        <span>
+          <span class="scene-name">${s.label}</span>
+          <div class="scene-blurb">${s.blurb}</div>
+        </span>
+      </button>`).join('');
+  }
+  renderScenes();
+
+  document.getElementById('scenes-mount').addEventListener('click', async (e) => {
+    const btn = e.target.closest('.scene-card');
+    if (!btn) return;
+    const original = btn.innerHTML;
+    btn.style.opacity = '0.6';
+    const changed = await hcApplyScene(btn.dataset.scene);
+    btn.style.opacity = '';
+    const nameEl = btn.querySelector('.scene-name');
+    if (nameEl) {
+      const prevText = nameEl.textContent;
+      nameEl.textContent = `Applied — ${changed} changed`;
+      setTimeout(() => { nameEl.textContent = prevText; }, 1600);
+    }
+    document.getElementById('ov-devices-on').textContent = window.HC_DEVICES.filter(d => d.state.on).length;
+    renderActivity();
+  });
+
+  // ---- Climate (weather + sensor readings) ----
   function climateTile(reading) {
     const delta = +(reading.trend[reading.trend.length - 1] - reading.trend[0]).toFixed(1);
     const arrow = delta > 0.05 ? '▲' : delta < -0.05 ? '▼' : '–';
@@ -57,6 +87,35 @@
       </div>`;
   }
 
+  function weatherTile(w) {
+    if (!w.ok) {
+      return `<div class="climate-tile weather-tile"><div class="climate-head"><svg><use href="#i-cloud"/></svg>Weather</div><div class="climate-note">Couldn't reach the weather service — ${w.message}</div></div>`;
+    }
+    return `
+      <div class="climate-tile weather-tile">
+        <div class="climate-head"><svg><use href="#${w.icon}"/></svg>Weather · Beirut</div>
+        <div style="display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;">
+          <div class="climate-value">${w.temp}<span class="climate-unit">°C</span></div>
+          <div class="muted" style="font-size:13px;">${w.label} · H:${w.high}° L:${w.low}°</div>
+        </div>
+        <div class="weather-outlook">${w.outlook}</div>
+      </div>`;
+  }
+
+  async function renderClimate() {
+    const [c, w] = await Promise.all([hcGetClimate(), hcGetWeather()]);
+    document.getElementById('climate-mount').innerHTML = [
+      weatherTile(w),
+      climateTile(c.outdoor),
+      climateTile(c.livingArea),
+      climateTile(c.parentsBedroom),
+      climateTile(c.kidsBedroom),
+      climateTile(c.hotWater)
+    ].join('');
+    return c;
+  }
+
+  // ---- Utilities & backup ----
   function vacuumTile(minutesLeft) {
     const h = Math.floor(minutesLeft / 60), m = minutesLeft % 60;
     const timeStr = h > 0 ? `${h}h ${m}m` : `${m} min`;
@@ -65,23 +124,56 @@
       <div class="climate-tile vacuum-tile">
         <div class="climate-head"><svg><use href="#i-vacuum"/></svg>Robot vacuum</div>
         <div class="climate-value">${timeStr}<span class="climate-unit"> left</span></div>
-        <div class="vacuum-bar"><div class="vacuum-bar-fill" style="width:${pct}%"></div></div>
-        <div class="vacuum-note">No public API — schedule is set in the eureka robot app; this mirrors it.</div>
+        <div class="level-bar"><div class="level-bar-fill" style="width:${pct}%"></div></div>
+        <div class="climate-note">No public API — schedule is set in the eureka robot app; this mirrors it.</div>
       </div>`;
   }
 
-  async function renderClimate() {
-    const c = await hcGetClimate();
-    document.getElementById('climate-mount').innerHTML = [
-      climateTile(c.outdoor),
-      climateTile(c.livingArea),
-      climateTile(c.parentsBedroom),
-      climateTile(c.kidsBedroom),
-      climateTile(c.hotWater),
-      vacuumTile(c.vacuumMinutesToClean)
+  function generatorTile(gen) {
+    const h = Math.floor(gen.runtimeTodayMin / 60), m = gen.runtimeTodayMin % 60;
+    return `
+      <div class="climate-tile generator-tile">
+        <div class="climate-head"><svg><use href="#i-generator"/></svg>Generator</div>
+        <div class="climate-value" style="font-size:20px;">${gen.running ? 'Running' : 'Standby'}</div>
+        <div class="level-bar"><div class="level-bar-fill" style="width:${gen.fuelPct}%"></div></div>
+        <div class="climate-note">Fuel ${gen.fuelPct}% · ${h}h ${m}m runtime today</div>
+      </div>`;
+  }
+
+  function waterTankTile(tank) {
+    return `
+      <div class="climate-tile water-tile">
+        <div class="climate-head"><svg><use href="#i-droplet"/></svg>Water tank</div>
+        <div class="climate-value">${tank.pct}<span class="climate-unit">%</span></div>
+        <div class="level-bar"><div class="level-bar-fill" style="width:${tank.pct}%"></div></div>
+        <div class="climate-note">Demo reading — wire to a real level sensor when you have one.</div>
+      </div>`;
+  }
+
+  async function renderUtilities(vacuumMinutes) {
+    const u = hcDemoUtilities();
+    document.getElementById('utilities-mount').innerHTML = [
+      waterTankTile(u.waterTank),
+      generatorTile(u.generator),
+      vacuumTile(vacuumMinutes)
     ].join('');
   }
 
-  await renderClimate();
-  setInterval(renderClimate, 30000);
+  // ---- Recent activity ----
+  function renderActivity() {
+    const items = hcGetActivity();
+    document.getElementById('activity-mount').innerHTML = items.map(a => `
+      <div class="activity-row">
+        <span class="activity-time">${hcRelativeTime(a.at)}</span>
+        <span class="activity-msg">${a.message}</span>
+      </div>`).join('') || '<div class="muted" style="font-size:13px;">Nothing yet — actions you take will show up here.</div>';
+  }
+  renderActivity();
+
+  async function refreshClimateAndUtilities() {
+    const c = await renderClimate();
+    await renderUtilities(c.vacuumMinutesToClean);
+  }
+  await refreshClimateAndUtilities();
+  setInterval(refreshClimateAndUtilities, 60000);
 })();
