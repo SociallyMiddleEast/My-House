@@ -67,6 +67,8 @@
     if (!result.ok) {
       d.state.on = !d.state.on; // revert
       render();
+    } else {
+      hcLogActivity(`${d.name} turned ${d.state.on ? 'on' : 'off'}`);
     }
   }
 
@@ -76,6 +78,7 @@
     d.state.temp = Math.max(16, Math.min(30, d.state.temp + delta));
     render();
     await hcSendDeviceCommand(d, { temp: d.state.temp });
+    hcLogActivity(`${d.name} set to ${d.state.temp}°`);
   }
 
   document.getElementById('rooms-mount').addEventListener('click', (e) => {
