@@ -13,9 +13,9 @@
     { key: 'smartthings', label: 'SmartThings', color: '#4FA6E8', manual: false,
       desc: 'Any device linked through a SmartThings account.',
       link: 'https://developer.smartthings.com', linkLabel: 'SmartThings developer docs' },
-    { key: 'philips', label: 'Philips Coolhome', color: '#8FD0E0', manual: true,
+    { key: 'philips', label: 'Philips Coolhome', color: '#2E93A6', manual: true,
       desc: 'Philips-branded air conditioners. Coolhome has no public developer API, so these tiles stay local — set them from the Coolhome app and mirror the state here if you want it reflected.' },
-    { key: 'eureka', label: 'Eureka', color: '#B48FE8', manual: true,
+    { key: 'eureka', label: 'Eureka', color: '#8862D6', manual: true,
       desc: 'Eureka robot vacuums. Eureka has no public developer API, so this tile stays local — set it from the eureka robot app.' }
   ];
 
