@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Overview — Home Control</title>
-<script>(function(){try{var s=JSON.parse(localStorage.getItem('hc_settings_v1')||'{}');var t=s.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+<script>(function(){try{var s=JSON.parse(localStorage.getItem('hc_settings_v1')||'{}');var t=s.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}try{var a=JSON.parse(localStorage.getItem('hc_auth_v1')||'null');if(a&&a.enabled){var ok=sessionStorage.getItem('hc_session_ok')||localStorage.getItem('hc_session_ok');if(ok!=='1'){document.documentElement.setAttribute('data-authgate','locked');}}}catch(e){}})();</script>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body data-page="overview">
@@ -19,12 +19,12 @@
         <div class="sub" id="ov-clock">—</div>
       </div>
       <div class="page-actions">
-        <a class="btn small" href="connections.html"><svg><use href="#i-gear"/></svg>Connections</a>
+        <a class="btn small" href="settings.html"><svg><use href="#i-gear"/></svg>Settings</a>
       </div>
     </div>
 
     <div id="ov-demo-callout" class="callout hidden" style="margin-bottom:22px">
-      Running on <strong>demo data</strong>. Head to <a href="connections.html">Connections</a> to point this at your real DeyeCloud, Tuya, LG ThinQ, or SmartThings accounts.
+      Running on <strong>demo data</strong>. Head to <a href="settings.html">Settings</a> to point this at your real DeyeCloud, Tuya, LG ThinQ, or SmartThings accounts.
     </div>
 
     <div class="hero-grid">
@@ -114,6 +114,7 @@
 <script src="assets/js/api.js"></script>
 <script src="assets/js/devices.js"></script>
 <script src="assets/js/nav.js"></script>
+<script src="assets/js/auth.js"></script>
 <script src="assets/js/overview.js"></script>
 </body>
 </html>
