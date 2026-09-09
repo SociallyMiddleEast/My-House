@@ -44,7 +44,7 @@ const HC_NAV_ITEMS = [
   { id: 'house-control', href: 'house-control.html',  label: 'House control',  icon: 'i-house',  accent: 'teal' },
   { id: 'pantry',        href: 'pantry.html',         label: 'Pantry',         icon: 'i-basket', accent: 'green' },
   { id: 'expenses',      href: 'expenses.html',       label: 'Expenses',       icon: 'i-wallet', accent: 'indigo' },
-  { id: 'connections',   href: 'connections.html',    label: 'Connections',    icon: 'i-plug' }
+  { id: 'settings',      href: 'settings.html',       label: 'Settings',       icon: 'i-gear' }
 ];
 
 function hcCurrentTheme() {
