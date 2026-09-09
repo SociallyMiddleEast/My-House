@@ -31,6 +31,12 @@
   document.getElementById('ov-floor2').textContent =
     devices.filter(d => d.floor === 2 && d.state.on).length + ' / ' + devices.filter(d => d.floor === 2).length + ' on';
 
+  // Pantry summary
+  const pantry = hcPantrySummary();
+  document.getElementById('ov-pantry-attention').textContent = pantry.needsAttention;
+  document.getElementById('ov-pantry-total').textContent = pantry.total;
+  document.getElementById('ov-pantry-expiring').textContent = pantry.expiring;
+
   // Platform badges
   const settings = hcLoadSettings();
   const badgeWrap = document.getElementById('ov-platform-badges');
