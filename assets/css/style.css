@@ -657,10 +657,10 @@ label.field .hint {
 .pantry-row .expiry-badge { font-size: 11px; padding: 3px 8px; border-radius: 100px; border: 1px solid var(--line); color: var(--text-muted); white-space: nowrap; }
 .pantry-row .expiry-badge.urgent { color: var(--bad); border-color: var(--bad); }
 
-.pantry-row .row-actions { display: flex; gap: 4px; flex-shrink: 0; }
-.pantry-row .row-actions button { width: 26px; height: 26px; border-radius: 4px; border: 1px solid var(--line); background: none; color: var(--text-faint); cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.pantry-row .row-actions button:hover { color: var(--text); background: var(--panel-raised); }
-.pantry-row .row-actions svg { width: 13px; height: 13px; }
+.row-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.row-actions button { width: 26px; height: 26px; border-radius: 4px; border: 1px solid var(--line); background: none; color: var(--text-faint); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.row-actions button:hover { color: var(--text); background: var(--panel-raised); }
+.row-actions svg { width: 13px; height: 13px; flex-shrink: 0; }
 
 @media (max-width: 560px) {
   .pantry-row { flex-wrap: wrap; }
