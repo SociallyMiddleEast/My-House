@@ -44,7 +44,12 @@ window.HC_PLATFORMS = {
   }
 };
 
-window.HC_DEVICES = [
+// Default starter devices — seeds localStorage the first time the site
+// loads, then the real editable list lives in storage (see hcLoadDevices()
+// / hcSaveDevices() in api.js). Add/edit/delete devices from House Control
+// itself now; editing this array only changes what a *fresh* browser starts
+// with, not any device already added through the UI.
+window.HC_DEVICE_SEED = [
   // ---- First floor ----
   { id: 'lr-ac',        floor: 1, room: 'Living Room',  name: 'Living Room AC',     platform: 'lg',          type: 'ac',     state: { on: true,  temp: 23 } },
   { id: 'lr-light',     floor: 1, room: 'Living Room',  name: 'Ceiling Light',      platform: 'tuya',        type: 'light',  state: { on: true,  brightness: 80 } },
