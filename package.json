@@ -1,0 +1,20 @@
+{
+  "name": "home-control-proxy",
+  "version": "1.0.0",
+  "description": "Backend proxy for the Home Control dashboard — holds API secrets for DeyeCloud, Tuya, LG ThinQ, and SmartThings so the static GitHub Pages frontend never has to.",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "node-fetch": "^2.7.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
