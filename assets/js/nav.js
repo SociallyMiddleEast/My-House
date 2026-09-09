@@ -26,6 +26,7 @@ const HC_ICON_SPRITE = `
 <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="7.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-dasharray="2.2 2.4"/></symbol>
 <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="12" y1="11" x2="12" y2="16.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="12" cy="7.8" r="1.05" fill="currentColor"/></symbol>
 <symbol id="i-moon" viewBox="0 0 24 24"><path d="M19.5 14.2A8 8 0 1 1 10.8 4.6a6.4 6.4 0 0 0 8.7 9.6z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+<symbol id="i-droplet" viewBox="0 0 24 24"><path d="M12 3.4C9.2 7.6 6.6 11.1 6.6 14.3a5.4 5.4 0 0 0 10.8 0C17.4 11.1 14.8 7.6 12 3.4z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
 </defs>
 </svg>`;
 
