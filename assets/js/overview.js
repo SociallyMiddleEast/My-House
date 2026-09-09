@@ -118,13 +118,15 @@
 
   async function renderClimate() {
     const [c, w] = await Promise.all([hcGetClimate(), hcGetWeather()]);
+    const customTiles = hcLoadGauges().filter(g => g.section === 'climate').map(customGaugeTile);
     document.getElementById('climate-mount').innerHTML = [
       weatherTile(w),
       climateTile(c.outdoor),
       climateTile(c.livingArea),
       climateTile(c.parentsBedroom),
       climateTile(c.kidsBedroom),
-      climateTile(c.hotWater)
+      climateTile(c.hotWater),
+      ...customTiles
     ].join('');
     return c;
   }
@@ -169,6 +171,25 @@
     return `<div class="climate-note${low ? ' low' : ''}">${low ? 'Low — ' : '~'}${daysLeft} days left at current use</div>`;
   }
 
+  function customGaugeTile(g) {
+    const bar = g.showBar
+      ? `<div class="level-bar"><div class="level-bar-fill" style="width:${Math.max(0, Math.min(100, g.value))}%; background:${g.color};"></div></div>`
+      : '';
+    return `
+      <div class="climate-tile" style="border-left-color:${g.color};" data-gauge-id="${g.id}">
+        <div class="climate-head" style="--gauge-color:${g.color};"><svg style="color:${g.color};"><use href="#${g.icon}"/></svg>${g.label}</div>
+        <div class="climate-value">
+          <span data-gauge-value>${g.value}</span><span class="climate-unit">${g.unit || ''}</span>
+        </div>
+        ${bar}
+        <div class="climate-note">Manual reading — adjust in Settings, or use the +/− here.</div>
+        <div class="qty-stepper" style="justify-content:flex-end;">
+          <button data-gauge-action="dec" data-gauge-id="${g.id}">−</button>
+          <button data-gauge-action="inc" data-gauge-id="${g.id}">+</button>
+        </div>
+      </div>`;
+  }
+
   function gasTile(gas) {
     return `
       <div class="climate-tile gas-tile">
@@ -191,12 +212,14 @@
 
   async function renderUtilities(vacuumMinutes) {
     const u = hcDemoUtilities();
+    const customTiles = hcLoadGauges().filter(g => g.section === 'utilities').map(customGaugeTile);
     document.getElementById('utilities-mount').innerHTML = [
       waterTankTile(u.waterTank),
       gasTile(u.gasTank),
       fuelOilTile(u.fuelOil),
       generatorTile(u.generator),
-      vacuumTile(vacuumMinutes)
+      vacuumTile(vacuumMinutes),
+      ...customTiles
     ].join('');
   }
 
@@ -217,4 +240,20 @@
   }
   await refreshClimateAndUtilities();
   setInterval(refreshClimateAndUtilities, 60000);
+
+  // ---- custom gauge steppers (event delegation, since tiles re-render every minute) ----
+  document.querySelector('.main').addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-gauge-action]');
+    if (!btn) return;
+    const id = btn.dataset.gaugeId;
+    const gauges = hcLoadGauges();
+    const g = gauges.find(x => x.id === id);
+    if (!g) return;
+    g.value = Math.max(0, +(g.value + (btn.dataset.gaugeAction === 'inc' ? 1 : -1)).toFixed(1));
+    hcSaveGauges(gauges);
+    const tile = btn.closest('[data-gauge-id]');
+    tile.querySelector('[data-gauge-value]').textContent = g.value;
+    const fill = tile.querySelector('.level-bar-fill');
+    if (fill) fill.style.width = Math.max(0, Math.min(100, g.value)) + '%';
+  });
 })();
