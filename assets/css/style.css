@@ -5,7 +5,10 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
-:root {
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
   /* Surfaces */
   --ink:          #12161B;
   --panel:        #1B2129;
@@ -28,7 +31,36 @@
   --good:         #5FBF83;
   --bad:          #E2604A;
   --neutral:      #8B96A3;
+}
 
+:root[data-theme="light"] {
+  color-scheme: light;
+
+  /* Surfaces — cool grey page, white panels, same graphite hue family as dark */
+  --ink:          #EEF1F4;
+  --panel:        #FFFFFF;
+  --panel-raised: #F5F7F9;
+  --line:         #DCE2E7;
+  --line-soft:    #E8ECEF;
+
+  /* Text */
+  --text:         #171B21;
+  --text-muted:   #59636F;
+  --text-faint:   #88919C;
+
+  /* Domain accents — deepened so they hold contrast on white */
+  --amber:        #C97F12;
+  --amber-dim:    #FBEEDA;
+  --teal:         #167A70;
+  --teal-dim:     #DEF2EF;
+
+  /* Status */
+  --good:         #1F9A57;
+  --bad:          #C8432E;
+  --neutral:      #59636F;
+}
+
+:root {
   /* Type */
   --font-display: 'Space Grotesk', 'IBM Plex Sans', sans-serif;
   --font-body:    'IBM Plex Sans', -apple-system, sans-serif;
@@ -40,8 +72,6 @@
 
 * { box-sizing: border-box; }
 
-html { color-scheme: dark; }
-
 body {
   margin: 0;
   background: var(--ink);
@@ -50,6 +80,7 @@ body {
   font-size: 15px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.15s ease, color 0.15s ease;
 }
 
 h1, h2, h3 {
@@ -98,6 +129,7 @@ button, input, select {
   position: sticky;
   top: 0;
   height: 100vh;
+  transition: border-color 0.15s ease;
 }
 
 .brand {
@@ -153,7 +185,28 @@ button, input, select {
   padding: 10px;
   border-top: 1px solid var(--line);
   padding-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
+
+.theme-toggle {
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.theme-toggle svg { width: 15px; height: 15px; }
+.theme-toggle:hover { background: var(--panel-raised); color: var(--text); }
 
 .grid-chip {
   display: flex;
@@ -161,6 +214,10 @@ button, input, select {
   gap: 8px;
   font-size: 12px;
   color: var(--text-muted);
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .dot {
@@ -270,6 +327,7 @@ button, input, select {
   border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 18px 20px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
 .status-pill {
