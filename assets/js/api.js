@@ -325,3 +325,58 @@ async function hcApplyScene(sceneId) {
   await Promise.all(sends);
   return changed;
 }
+
+/* ---------------------------- pantry (fully local — no cloud API exists for this) ---------------------------- */
+// Everything here lives in this browser's localStorage. There's no
+// "connect to my supermarket" integration to speak of, so unlike the rest
+// of the site this isn't demo-vs-live — it's just a real, working list.
+
+const HC_PANTRY_KEY = 'hc_pantry_v1';
+
+function hcLoadPantry() {
+  try {
+    const list = JSON.parse(localStorage.getItem(HC_PANTRY_KEY) || 'null');
+    if (list) return list;
+  } catch (e) { /* fall through to seed */ }
+
+  const today = new Date();
+  const inDays = n => new Date(today.getTime() + n * 86400000).toISOString().slice(0, 10);
+  const seed = [
+    { id: 'p1', name: 'Milk', category: 'groceries', quantity: 2, unit: 'L', lowThreshold: 1, expiresAt: null },
+    { id: 'p2', name: 'Eggs', category: 'groceries', quantity: 6, unit: 'pcs', lowThreshold: 4, expiresAt: null },
+    { id: 'p3', name: 'Rice', category: 'groceries', quantity: 1, unit: 'kg', lowThreshold: 2, expiresAt: null },
+    { id: 'p4', name: 'Olive oil', category: 'groceries', quantity: 0, unit: 'bottle', lowThreshold: 1, expiresAt: null },
+    { id: 'p5', name: 'Dish soap', category: 'household', quantity: 1, unit: 'bottle', lowThreshold: 1, expiresAt: null },
+    { id: 'p6', name: 'Paper towels', category: 'household', quantity: 4, unit: 'rolls', lowThreshold: 2, expiresAt: null },
+    { id: 'p7', name: 'Paracetamol', category: 'medicine', quantity: 8, unit: 'tabs', lowThreshold: 6, expiresAt: inDays(280) },
+    { id: 'p8', name: 'Antiseptic cream', category: 'medicine', quantity: 1, unit: 'tube', lowThreshold: 1, expiresAt: inDays(18) }
+  ];
+  localStorage.setItem(HC_PANTRY_KEY, JSON.stringify(seed));
+  return seed;
+}
+
+function hcSavePantry(list) {
+  localStorage.setItem(HC_PANTRY_KEY, JSON.stringify(list));
+}
+
+function hcPantryStatus(item) {
+  if (item.quantity <= 0) return 'out';
+  if (item.quantity <= item.lowThreshold) return 'low';
+  return 'ok';
+}
+
+function hcExpiryStatus(item) {
+  if (!item.expiresAt) return null;
+  const days = Math.round((new Date(item.expiresAt) - new Date()) / 86400000);
+  if (days < 0) return { label: 'Expired', days, urgent: true };
+  if (days <= 30) return { label: `Expires in ${days}d`, days, urgent: true };
+  return { label: `Expires ${item.expiresAt}`, days, urgent: false };
+}
+
+function hcPantrySummary() {
+  const list = hcLoadPantry();
+  const low = list.filter(i => hcPantryStatus(i) === 'low').length;
+  const out = list.filter(i => hcPantryStatus(i) === 'out').length;
+  const expiring = list.filter(i => { const e = hcExpiryStatus(i); return e && e.urgent; }).length;
+  return { total: list.length, low, out, expiring, needsAttention: low + out };
+}
