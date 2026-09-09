@@ -380,3 +380,50 @@ function hcPantrySummary() {
   const expiring = list.filter(i => { const e = hcExpiryStatus(i); return e && e.urgent; }).length;
   return { total: list.length, low, out, expiring, needsAttention: low + out };
 }
+
+/* ---------------------------- expenses (fully local, same idea as pantry) ---------------------------- */
+
+const HC_EXPENSES_KEY = 'hc_expenses_v1';
+
+function hcLoadExpenses() {
+  try {
+    const list = JSON.parse(localStorage.getItem(HC_EXPENSES_KEY) || 'null');
+    if (list) return list;
+  } catch (e) { /* fall through to seed */ }
+
+  const today = new Date();
+  const iso = (day) => new Date(today.getFullYear(), today.getMonth(), day).toISOString().slice(0, 10);
+  const seed = [
+    { id: 'x1', date: iso(3), amount: 85.5, category: 'groceries', note: 'Weekly groceries' },
+    { id: 'x2', date: iso(5), amount: 40, category: 'fuel', note: 'Gas cylinder refill' },
+    { id: 'x3', date: iso(8), amount: 120, category: 'utilities', note: 'EDL electricity bill' },
+    { id: 'x4', date: iso(1), amount: 25, category: 'medicine', note: 'Pharmacy' }
+  ];
+  localStorage.setItem(HC_EXPENSES_KEY, JSON.stringify(seed));
+  return seed;
+}
+
+function hcSaveExpenses(list) {
+  localStorage.setItem(HC_EXPENSES_KEY, JSON.stringify(list));
+}
+
+function hcExpensesInMonth(list, year, month) {
+  return list.filter(e => {
+    const d = new Date(e.date);
+    return d.getFullYear() === year && d.getMonth() === month;
+  });
+}
+
+function hcExpenseSummary() {
+  const list = hcLoadExpenses();
+  const now = new Date();
+  const thisMonth = hcExpensesInMonth(list, now.getFullYear(), now.getMonth());
+  const prev = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const lastMonth = hcExpensesInMonth(list, prev.getFullYear(), prev.getMonth());
+  return {
+    total: thisMonth.reduce((a, e) => a + e.amount, 0),
+    count: thisMonth.length,
+    lastTotal: lastMonth.reduce((a, e) => a + e.amount, 0),
+    entries: list.length
+  };
+}
