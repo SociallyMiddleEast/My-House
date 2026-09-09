@@ -18,7 +18,7 @@
     };
   }
 
-  /* ---------------------------- Sheets connection UI ---------------------------- */
+  /* ---------------------------- Sheets connection status (setup lives in Settings) ---------------------------- */
 
   const shStatus = document.getElementById('sh-status');
   function setSheetStatus(kind, message) {
@@ -27,20 +27,8 @@
     shStatus.innerHTML = `<span class="dot ${dotClass}"></span>${message}`;
   }
 
-  document.getElementById('sh-client-id').value = hcLoadSheetSettings().clientId || '';
-  document.getElementById('sh-sheet-id').value = hcLoadSheetSettings().sheetId || '';
-  if (hcSheetsConfigured()) setSheetStatus('idle', 'Not connected yet — click Connect Google');
-
-  document.getElementById('sh-save').addEventListener('click', () => {
-    hcSaveSheetSettings({
-      clientId: document.getElementById('sh-client-id').value.trim(),
-      sheetId: document.getElementById('sh-sheet-id').value.trim()
-    });
-    setSheetStatus('idle', 'Saved — click Connect Google');
-  });
-
   async function afterConnected(err) {
-    if (err) { setSheetStatus('error', typeof err === 'string' ? err : 'Connection failed'); return; }
+    if (err) { setSheetStatus('idle', 'Not connected — sign in on Settings'); return; }
     setSheetStatus('busy', 'Syncing…');
     try {
       const remote = await hcSheetsFetchTab('Pantry', 'A1:G1000', parsePantryRow);
@@ -49,17 +37,16 @@
       } else {
         hcSavePantry(remote); // sheet has data — it wins
       }
-      setSheetStatus('ok', 'Connected — synced ' + new Date().toLocaleTimeString());
+      setSheetStatus('ok', 'Synced ' + new Date().toLocaleTimeString());
       render();
     } catch (e) {
       setSheetStatus('error', e.message);
     }
   }
 
-  document.getElementById('sh-connect').addEventListener('click', () => hcConnectGoogle(afterConnected));
-
   if (hcSheetsConfigured()) {
-    hcTrySilentConnect((err) => { if (!err) afterConnected(null); });
+    setSheetStatus('idle', 'Connecting…');
+    hcTrySilentConnect((err) => afterConnected(err));
   }
 
   function persistPantry(list) {
