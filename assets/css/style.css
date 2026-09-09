@@ -522,6 +522,8 @@ label.field .hint {
 .climate-tile.weather-tile { border-left-color: var(--amber); grid-column: span 2; }
 .climate-tile.generator-tile { border-left-color: #D97A4A; }
 .climate-tile.water-tile { border-left-color: #3B8FC4; }
+.climate-tile.gas-tile { border-left-color: #C9A227; }
+.climate-tile.oil-tile { border-left-color: #8B5E34; }
 
 .climate-head { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--text-muted); }
 .climate-head svg { width: 14px; height: 14px; color: var(--teal); flex-shrink: 0; }
@@ -529,6 +531,8 @@ label.field .hint {
 .weather-tile .climate-head svg { color: var(--amber); }
 .generator-tile .climate-head svg { color: #D97A4A; }
 .water-tile .climate-head svg { color: #3B8FC4; }
+.gas-tile .climate-head svg { color: #C9A227; }
+.oil-tile .climate-head svg { color: #8B5E34; }
 
 .climate-value { font-family: var(--font-display); font-size: 25px; font-weight: 600; line-height: 1; }
 .climate-unit { font-size: 14px; font-weight: 400; color: var(--text-muted); margin-left: 1px; }
@@ -545,7 +549,10 @@ label.field .hint {
 .vacuum-tile .level-bar-fill { background: #8862D6; }
 .generator-tile .level-bar-fill { background: #D97A4A; }
 .water-tile .level-bar-fill { background: #3B8FC4; }
+.gas-tile .level-bar-fill { background: #C9A227; }
+.oil-tile .level-bar-fill { background: #8B5E34; }
 .climate-note { font-size: 11px; color: var(--text-faint); line-height: 1.4; }
+.climate-note.low { color: var(--bad); }
 
 /* ---------------------------------- scenes --------------------------------- */
 
