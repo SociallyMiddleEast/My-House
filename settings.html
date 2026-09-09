@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — Home Control</title>
+<script>(function(){try{var s=JSON.parse(localStorage.getItem('hc_settings_v1')||'{}');var t=s.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}try{var a=JSON.parse(localStorage.getItem('hc_auth_v1')||'null');if(a&&a.enabled){var ok=sessionStorage.getItem('hc_session_ok')||localStorage.getItem('hc_session_ok');if(ok!=='1'){document.documentElement.setAttribute('data-authgate','locked');}}}catch(e){}})();</script>
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body data-page="settings">
+<div class="shell" id="shell">
+  <aside class="sidebar" id="sidebar-mount"></aside>
+  <main class="main">
+    <div class="topbar" id="topbar-mount"></div>
+
+    <div class="page-head">
+      <div>
+        <h1>Settings</h1>
+        <div class="sub">Account, data sources, and dashboard customization — all in one place.</div>
+      </div>
+    </div>
+
+    <!-- ============================== ACCOUNT ============================== -->
+    <div class="section-title" style="margin-top:0;">Account</div>
+    <div class="panel" style="margin-bottom:8px;">
+      <div class="callout" style="margin-bottom:16px;">
+        This is a privacy screen, not real security. The check runs entirely in this browser's JavaScript — anyone with dev tools open can read the stored password hash or skip the check outright. It stops a family member from casually opening the dashboard; it does not protect your DeyeCloud/Tuya data or Google Sheets access. Those stay protected by your proxy's key and your Google account regardless of whether this is on.
+      </div>
+
+      <div id="auth-current-status" class="status-pill" style="margin-bottom:16px;"></div>
+
+      <div id="auth-setup-form">
+        <label class="field">
+          <span class="lbl">Username</span>
+          <input class="input" id="acc-username" autocomplete="username">
+        </label>
+        <label class="field">
+          <span class="lbl">Password</span>
+          <input class="input" type="password" id="acc-password" autocomplete="new-password">
+        </label>
+        <div style="display:flex; gap:8px;">
+          <button class="btn primary" id="acc-save"><svg><use href="#i-check"/></svg>Set up login</button>
+          <button class="btn danger hidden" id="acc-disable">Turn off login</button>
+          <button class="btn hidden" id="acc-logout">Log out</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================== DATA SOURCE ============================== -->
+    <div class="section-title">Data source</div>
+    <div class="callout" style="margin-bottom:16px;">
+      DeyeCloud, Tuya, LG ThinQ, and SmartThings all require a signed, secret-holding request — something a public GitHub Pages site can't safely do alone. This dashboard talks to a small backend proxy you deploy yourself (see <code>/server</code> in the project). The proxy holds your real API keys; the browser only ever knows its URL.
+    </div>
+    <div class="panel">
+      <label class="field">
+        <span class="lbl">Mode</span>
+        <div class="seg" id="mode-tabs">
+          <button class="seg-btn" data-mode="demo">Demo data</button>
+          <button class="seg-btn" data-mode="live">Live proxy</button>
+        </div>
+      </label>
+      <label class="field">
+        <span class="lbl">Proxy base URL</span>
+        <input class="input" id="proxy-url" placeholder="https://your-proxy.onrender.com">
+        <span class="hint">The deployed URL of the /server app in this project.</span>
+      </label>
+      <label class="field">
+        <span class="lbl">Proxy access key <span class="muted" style="font-family:var(--font-body)">(optional but recommended)</span></span>
+        <input class="input" id="proxy-key" placeholder="matches PROXY_API_KEY on the server">
+        <span class="hint">Sent as the x-proxy-key header, so the proxy — which can control real devices — isn't open to the public internet.</span>
+      </label>
+      <div style="display:flex; gap:10px; align-items:center; margin-top:4px;">
+        <button class="btn primary" id="conn-save"><svg><use href="#i-check"/></svg>Save</button>
+        <button class="btn" id="conn-test"><svg><use href="#i-refresh"/></svg>Test connection</button>
+        <span id="conn-test-result" class="status-pill hidden"></span>
+      </div>
+    </div>
+
+    <!-- ============================== INTEGRATIONS ============================== -->
+    <div class="section-title">Integrations</div>
+    <div style="display:flex; flex-direction:column; gap:10px;" id="integrations-mount"></div>
+
+    <!-- ============================== GOOGLE SHEETS ============================== -->
+    <div class="section-title">Google Sheets sync</div>
+    <div class="panel" style="margin-bottom:8px;">
+      <p class="muted" style="font-size:13px; margin:0 0 14px;">
+        One connection, shared by Pantry and Expenses — each writes to its own tab (named exactly <strong>Pantry</strong> and <strong>Expenses</strong>) in the same Sheet. Setup is one-time in <a href="https://console.cloud.google.com" target="_blank" rel="noopener" style="color:var(--indigo);">Google Cloud Console</a>: enable the Sheets API, create an OAuth Client ID ("Web application") with this site's URL under Authorized JavaScript origins, and add your own Google account as a test user on the OAuth consent screen. You'll see an "unverified app" warning when connecting — expected for a personal app.
+      </p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <label class="field">
+          <span class="lbl">OAuth Client ID</span>
+          <input class="input" id="sh-client-id" placeholder="xxxx.apps.googleusercontent.com">
+        </label>
+        <label class="field">
+          <span class="lbl">Sheet ID</span>
+          <input class="input" id="sh-sheet-id" placeholder="from the sheet's URL, between /d/ and /edit">
+        </label>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <button class="btn small" id="sh-save">Save</button>
+        <button class="btn small primary" id="sh-connect" style="background:var(--indigo); border-color:var(--indigo); color:#0E1330;">Connect Google</button>
+        <span id="sh-status" class="status-pill hidden"></span>
+      </div>
+    </div>
+
+    <!-- ============================== CUSTOM GAUGES ============================== -->
+    <div class="section-title">Custom gauges</div>
+    <p class="muted" style="font-size:13px; margin:0 0 14px;">
+      Add your own tiles to Overview's Climate and Utilities sections — a pool temperature, a second water tank, whatever isn't covered above. No live data source; you (or anyone with the dashboard open) adjust the value with +/− right on Overview, or here.
+    </p>
+
+    <div id="gauge-list-mount" style="margin-bottom:16px;"></div>
+
+    <div class="panel">
+      <div class="section-title" style="margin-top:0; font-size:14px;">Add a gauge</div>
+      <div style="display:grid; grid-template-columns:2fr 1fr; gap:12px;">
+        <label class="field">
+          <span class="lbl">Label</span>
+          <input class="input" id="gf-label" placeholder="e.g. Pool temperature">
+        </label>
+        <label class="field">
+          <span class="lbl">Unit</span>
+          <input class="input" id="gf-unit" placeholder="°C, %, kg...">
+        </label>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <label class="field">
+          <span class="lbl">Starting value</span>
+          <input class="input" type="number" id="gf-value" value="0" step="0.1">
+        </label>
+        <label class="field">
+          <span class="lbl">Shows on</span>
+          <select class="input" id="gf-section">
+            <option value="climate">Climate</option>
+            <option value="utilities">Utilities &amp; backup</option>
+          </select>
+        </label>
+      </div>
+      <label class="field">
+        <span class="lbl">Icon</span>
+        <div id="gf-icon-picker" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+      </label>
+      <label class="field">
+        <span class="lbl">Color</span>
+        <div id="gf-color-picker" style="display:flex; flex-wrap:wrap; gap:6px;"></div>
+      </label>
+      <label style="display:flex; align-items:center; gap:8px; font-size:13px; margin-bottom:16px;">
+        <input type="checkbox" id="gf-showbar" checked> Show as a 0–100 level bar (turn off for a plain number)
+      </label>
+      <button class="btn primary" id="gf-add"><svg><use href="#i-check"/></svg>Add gauge</button>
+    </div>
+
+  </main>
+</div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/devices.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/sheets-sync.js"></script>
+<script src="assets/js/auth.js"></script>
+<script src="assets/js/settings.js"></script>
+</body>
+</html>
