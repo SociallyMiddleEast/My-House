@@ -80,6 +80,21 @@
 
 * { box-sizing: border-box; }
 
+html[data-authgate="locked"] .shell { display: none; }
+
+.auth-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.auth-card { width: 100%; max-width: 340px; }
+
 body {
   margin: 0;
   background: var(--ink);
@@ -217,6 +232,20 @@ button, input, select {
 
 .theme-toggle svg { width: 15px; height: 15px; }
 .theme-toggle:hover { background: var(--panel-raised); color: var(--text); }
+
+.icon-swatch {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+.icon-swatch:hover { background: var(--panel-raised); }
+.icon-swatch svg { width: 16px; height: 16px; }
 
 .grid-chip {
   display: flex;
