@@ -1,125 +1,100 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Energy — Home Control</title>
-<script>(function(){try{var s=JSON.parse(localStorage.getItem('hc_settings_v1')||'{}');var t=s.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
-<link rel="stylesheet" href="assets/css/style.css">
-</head>
-<body data-page="energy">
-<div class="shell" id="shell">
-  <aside class="sidebar" id="sidebar-mount"></aside>
-  <main class="main">
-    <div class="topbar" id="topbar-mount"></div>
+(function hcEnergyPage() {
 
-    <div class="page-head">
-      <div>
-        <h1>Energy management</h1>
-        <div class="sub" id="nrg-sub">—</div>
-      </div>
-      <div class="page-actions">
-        <button class="btn small" id="nrg-refresh"><svg><use href="#i-refresh"/></svg>Refresh</button>
-        <a class="btn small primary" href="connections.html" id="nrg-connect-btn"><svg><use href="#i-plug"/></svg>Connect DeyeCloud</a>
-      </div>
-    </div>
+  function fmtKw(v) { return (Math.round(v * 10) / 10).toFixed(1) + ' kW'; }
 
-    <div id="nrg-callout" class="callout hidden" style="margin-bottom:20px"></div>
+  function buildChart(history) {
+    const W = 680, base = 140, top = 15;
+    const xMin = 6, xMax = 18;
+    const maxKw = Math.max(1, ...history.map(p => p.kw)) * 1.15;
+    const pts = history
+      .filter(p => p.t >= xMin - 0.01 && p.t <= xMax + 0.01)
+      .map(p => {
+        const x = Math.max(0, Math.min(W, ((p.t - xMin) / (xMax - xMin)) * W));
+        const y = base - (p.kw / maxKw) * (base - top);
+        return [x, y];
+      });
+    if (pts.length < 2) return;
+    const line = pts.map((p, i) => (i === 0 ? 'M' : 'L') + p[0].toFixed(1) + ',' + p[1].toFixed(1)).join(' ');
+    const area = line + ` L${pts[pts.length - 1][0].toFixed(1)},${base} L${pts[0][0].toFixed(1)},${base} Z`;
+    document.getElementById('chart-line').setAttribute('d', line);
+    document.getElementById('chart-area').setAttribute('d', area);
+  }
 
-    <div class="metric-row">
-      <div class="panel metric-tile">
-        <div class="lbl">Solar now</div>
-        <div class="val" id="m-pv">—</div>
-        <div class="ctx">from the array</div>
-      </div>
-      <div class="panel metric-tile">
-        <div class="lbl">Battery</div>
-        <div class="val" id="m-soc">—</div>
-        <div class="ctx" id="m-soc-ctx">—</div>
-      </div>
-      <div class="panel metric-tile">
-        <div class="lbl">Grid</div>
-        <div class="val" id="m-grid">—</div>
-        <div class="ctx" id="m-grid-ctx">—</div>
-      </div>
-      <div class="panel metric-tile">
-        <div class="lbl">House load</div>
-        <div class="val" id="m-load">—</div>
-        <div class="ctx">current draw</div>
-      </div>
-    </div>
+  function setFlow(id, active, reverse) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.toggle('active', !!active);
+    el.classList.toggle('reverse', !!reverse);
+  }
 
-    <div class="section-title">Power flow</div>
-    <div class="panel">
-      <svg viewBox="0 0 680 210" style="width:100%; height:auto; display:block;">
-        <path class="flow-line" id="line-solar" d="M120,58 L308,96"/>
-        <path class="flow-line" id="line-house" d="M372,96 L560,58"/>
-        <path class="flow-line" id="line-batt"  d="M340,124 L340,158"/>
-        <path class="flow-line" id="line-grid"  d="M590,88 L590,152"/>
+  function render(data) {
+    document.getElementById('m-pv').textContent = fmtKw(data.pvPower);
+    document.getElementById('m-soc').textContent = data.batterySoc + '%';
+    document.getElementById('m-soc-ctx').textContent =
+      data.batteryPower > 0.05 ? 'Charging at ' + fmtKw(data.batteryPower) :
+      data.batteryPower < -0.05 ? 'Discharging at ' + fmtKw(-data.batteryPower) : 'Idle';
 
-        <g class="flow-node" id="node-solar" transform="translate(90,58)">
-          <circle r="26"/>
-          <use href="#i-sun" x="-11" y="-11" width="22" height="22"/>
-          <text class="flow-label" x="0" y="42" text-anchor="middle">Solar</text>
-          <text class="flow-value" x="0" y="-36" text-anchor="middle" id="node-solar-val">—</text>
-        </g>
+    const grid = data.gridPower;
+    document.getElementById('m-grid').textContent =
+      grid > 0.05 ? fmtKw(grid) : grid < -0.05 ? fmtKw(-grid) : '0.0 kW';
+    document.getElementById('m-grid-ctx').textContent =
+      grid > 0.05 ? 'importing' : grid < -0.05 ? 'exporting' : 'balanced';
 
-        <g class="flow-node" id="node-inv" transform="translate(340,96)">
-          <circle r="28"/>
-          <use href="#i-bolt" x="-11" y="-11" width="22" height="22"/>
-          <text class="flow-label" x="0" y="46" text-anchor="middle">Inverter</text>
-        </g>
+    document.getElementById('m-load').textContent = fmtKw(data.loadPower);
 
-        <g class="flow-node" id="node-house" transform="translate(590,58)">
-          <circle r="26"/>
-          <use href="#i-house" x="-11" y="-11" width="22" height="22"/>
-          <text class="flow-label" x="0" y="42" text-anchor="middle">House</text>
-          <text class="flow-value" x="0" y="-36" text-anchor="middle" id="node-house-val">—</text>
-        </g>
+    document.getElementById('node-solar-val').textContent = fmtKw(data.pvPower);
+    document.getElementById('node-house-val').textContent = fmtKw(data.loadPower);
+    document.getElementById('node-batt-val').textContent = fmtKw(Math.abs(data.batteryPower));
+    document.getElementById('node-grid-val').textContent = fmtKw(Math.abs(grid));
 
-        <g class="flow-node" id="node-batt" transform="translate(340,182)">
-          <circle r="26"/>
-          <use href="#i-battery" x="-11" y="-11" width="22" height="22"/>
-          <text class="flow-label" x="0" y="42" text-anchor="middle">Battery</text>
-          <text class="flow-value" x="0" y="-36" text-anchor="middle" id="node-batt-val">—</text>
-        </g>
+    document.getElementById('node-solar').classList.toggle('active', data.pvPower > 0.05);
+    document.getElementById('node-batt').classList.toggle('active', Math.abs(data.batteryPower) > 0.05);
+    document.getElementById('node-grid').classList.toggle('active', Math.abs(grid) > 0.05);
+    document.getElementById('node-house').classList.toggle('active', data.loadPower > 0.05);
 
-        <g class="flow-node" id="node-grid" transform="translate(590,182)">
-          <circle r="26"/>
-          <use href="#i-tower" x="-11" y="-11" width="22" height="22"/>
-          <text class="flow-label" x="0" y="42" text-anchor="middle">Grid</text>
-          <text class="flow-value" x="0" y="-36" text-anchor="middle" id="node-grid-val">—</text>
-        </g>
-      </svg>
-    </div>
+    setFlow('line-solar', data.pvPower > 0.05, false);
+    setFlow('line-house', data.loadPower > 0.05, false);
+    setFlow('line-batt', Math.abs(data.batteryPower) > 0.05, data.batteryPower < 0);
+    setFlow('line-grid', Math.abs(grid) > 0.05, grid < 0);
 
-    <div class="section-title">Today's generation</div>
-    <div class="panel">
-      <svg id="chart-svg" viewBox="0 0 680 180" style="width:100%; height:auto; display:block;">
-        <line x1="0" y1="140" x2="680" y2="140" stroke="var(--line)" stroke-width="1"/>
-        <path id="chart-area" fill="var(--amber-dim)" stroke="none" opacity="0.6"/>
-        <path id="chart-line" fill="none" stroke="var(--amber)" stroke-width="2"/>
-      </svg>
-      <div style="display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-faint); margin-top:6px;">
-        <span>6:00</span><span>9:00</span><span>12:00</span><span>15:00</span><span>18:00</span>
-      </div>
-    </div>
+    document.getElementById('st-name').textContent = data.stationName || '—';
+    document.getElementById('st-today').textContent = data.todayKwh + ' kWh';
+    document.getElementById('st-month').textContent = data.monthKwh + ' kWh';
+    document.getElementById('st-total').textContent = data.totalKwh.toLocaleString() + ' kWh';
+    document.getElementById('st-sync').textContent = new Date(data.updatedAt).toLocaleTimeString();
 
-    <div class="section-title">Station</div>
-    <div class="panel" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:16px;">
-      <div><div class="lbl" style="font-size:12px;color:var(--text-muted);margin-bottom:5px;">Station</div><div id="st-name" class="mono" style="font-size:13px;">—</div></div>
-      <div><div class="lbl" style="font-size:12px;color:var(--text-muted);margin-bottom:5px;">Today</div><div id="st-today" class="mono" style="font-size:13px;">—</div></div>
-      <div><div class="lbl" style="font-size:12px;color:var(--text-muted);margin-bottom:5px;">This month</div><div id="st-month" class="mono" style="font-size:13px;">—</div></div>
-      <div><div class="lbl" style="font-size:12px;color:var(--text-muted);margin-bottom:5px;">Lifetime</div><div id="st-total" class="mono" style="font-size:13px;">—</div></div>
-      <div><div class="lbl" style="font-size:12px;color:var(--text-muted);margin-bottom:5px;">Last sync</div><div id="st-sync" class="mono" style="font-size:13px;">—</div></div>
-    </div>
+    document.getElementById('nrg-sub').textContent =
+      'Last updated ' + new Date(data.updatedAt).toLocaleTimeString();
 
-  </main>
-</div>
+    buildChart(data.history);
 
-<script src="assets/js/config.js"></script>
-<script src="assets/js/api.js"></script>
-<script src="assets/js/nav.js"></script>
-<script src="assets/js/energy.js"></script>
-</body>
-</html>
+    const callout = document.getElementById('nrg-callout');
+    if (data.error) {
+      callout.className = 'callout';
+      callout.style.borderLeftColor = 'var(--bad)';
+      callout.innerHTML = `<strong>Live fetch failed</strong> — showing demo data instead. ${data.error}`;
+      callout.classList.remove('hidden');
+    } else if (!hcIsLive() || !hcServiceEnabled('deye')) {
+      callout.className = 'callout';
+      callout.innerHTML = `Showing <strong>demo data</strong>. Add your DeyeCloud credentials to the backend proxy and connect it on the <a href="settings.html">Settings</a> page for live readings.`;
+      callout.classList.remove('hidden');
+    } else {
+      callout.classList.add('hidden');
+    }
+
+    const connectBtn = document.getElementById('nrg-connect-btn');
+    if (hcIsLive() && hcServiceEnabled('deye')) {
+      connectBtn.textContent = 'Manage connection';
+      connectBtn.classList.remove('primary');
+    }
+  }
+
+  async function refresh() {
+    const data = await hcGetEnergy();
+    render(data);
+  }
+
+  document.getElementById('nrg-refresh').addEventListener('click', refresh);
+  refresh();
+  setInterval(refresh, hcIsLive() ? 30000 : 6000);
+})();
