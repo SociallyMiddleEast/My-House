@@ -33,7 +33,7 @@
     <div class="panel" id="sheets-panel" style="margin-bottom:20px;">
       <div class="section-title" style="margin-top:0;">Google Sheets sync</div>
       <p class="muted" style="font-size:13px; margin:0 0 14px;">
-        Optional — keeps Pantry in sync across every device by reading and writing a Sheet you control. The buttons below don't change; they'll just read from and write to this Sheet instead of only this browser.
+        Optional — keeps Pantry (and Expenses, if you set that up too) in sync across every device by reading and writing a Sheet you control. The buttons below don't change; they'll just read from and write to this Sheet instead of only this browser. This page writes to a tab named exactly <strong>Pantry</strong> — create one (rename "Sheet1" to "Pantry" works fine) before connecting.
         Setup is one-time in <a href="https://console.cloud.google.com" target="_blank" rel="noopener" style="color:var(--good);">Google Cloud Console</a>: enable the Sheets API, create an OAuth Client ID (type "Web application") with this site's URL under Authorized JavaScript origins, and add your own Google account as a test user on the OAuth consent screen — otherwise sign-in will be blocked. You'll see an "unverified app" warning when connecting; that's expected for a personal app.
       </p>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
