@@ -22,7 +22,7 @@
   document.getElementById('ov-today').textContent = energy.todayKwh + ' kWh';
 
   // House control summary
-  const devices = window.HC_DEVICES;
+  const devices = hcLoadDevices();
   const on = devices.filter(d => d.state.on).length;
   document.getElementById('ov-devices-on').textContent = on;
   document.getElementById('ov-devices-total').textContent = devices.length;
@@ -81,7 +81,7 @@
       nameEl.textContent = `Applied — ${changed} changed`;
       setTimeout(() => { nameEl.textContent = prevText; }, 1600);
     }
-    document.getElementById('ov-devices-on').textContent = window.HC_DEVICES.filter(d => d.state.on).length;
+    document.getElementById('ov-devices-on').textContent = hcLoadDevices().filter(d => d.state.on).length;
     renderActivity();
   });
 
