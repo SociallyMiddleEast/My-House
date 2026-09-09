@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Energy — Home Control</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="energy">
+<div class="shell" id="shell">
+  <aside class="sidebar" id="sidebar-mount"></aside>
+  <main class="main">
+    <div class="topbar" id="topbar-mount"></div>
+
+    <div class="page-head">
+      <div>
+        <h1>Energy management</h1>
+        <div class="sub" id="nrg-sub">—</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn small" id="nrg-refresh"><svg><use href="#i-refresh"/></svg>Refresh</button>
+        <a class="btn small primary" href="connections.html" id="nrg-connect-btn"><svg><use href="#i-plug"/></svg>Connect DeyeCloud</a>
+      </div>
+    </div>
+
+    <div id="nrg-callout" class="callout hidden" style="margin-bottom:20px"></div>
+
+    <div class="metric-row">
+      <div class="panel metric-tile">
+        <div class="lbl">Solar now</div>
+        <div class="val" id="m-pv">—</div>
+        <div class="ctx">from the array</div>
+      </div>
+      <div class="panel metric-tile">
+        <div class="lbl">Battery</div>
+        <div class="val" id="m-soc">—</div>
+        <div class="ctx" id="m-soc-ctx">—</div>
+      </div>
+      <div class="panel metric-tile">
+        <div class="lbl">Grid</div>
+        <div class="val" id="m-grid">—</div>
+        <div class="ctx" id="m-grid-ctx">—</div>
+      </div>
+      <div class="panel metric-tile">
+        <div class="lbl">House load</div>
+        <div class="val" id="m-load">—</div>
+        <div class="ctx">current draw</div>
+      </div>
+    </div>
+
+    <div class="section-title">Power flow</div>
+    <div class="panel">
+      <svg viewBox="0 0 680 210" style="width:100%; height:auto; display:block;">
+        <path class="flow-line" id="line-solar" d="M120,58 L308,96"/>
+        <path class="flow-line" id="line-house" d="M372,96 L560,58"/>
+        <path class="flow-line" id="line-batt"  d="M340,124 L340,158"/>
+        <path class="flow-line" id="line-grid"  d="M590,88 L590,152"/>
+
+        <g class="flow-node" id="node-solar" transform="translate(90,58)">
+          <circle r="26"/>
+          <use href="#i-sun" x="-11" y="-11" width="22" height="22"/>
+          <text class="flow-label" x="0" y="42" text-anchor="middle">Solar</text>
+          <text class="flow-value" x="0" y="-36" text-anchor="middle" id="node-solar-val">—</text>
+        </g>
+
+        <g class="flow-node" id="node-inv" transform="translate(340,96)">
+          <circle r="28"/>
+          <use href="#i-bolt" x="-11" y="-11" width="22" height="22"/>
+          <text class="flow-label" x="0" y="46" text-anchor="middle">Inverter</text>
+        </g>
+
+        <g class="flow-node" id="node-house" transform="translate(590,58)">
+          <circle r="26"/>
+          <use href="#i-house" x="-11" y="-11" width="22" height="22"/>
+          <text class="flow-label" x="0" y="42" text-anchor="middle">House</text>
+          <text class="flow-value" x="0" y="-36" text-anchor="middle" id="node-house-val">—</text>
+        </g>
+
+        <g class="flow-node" id="node-batt" transform="translate(340,182)">
+          <circle r="26"/>
+          <use href="#i-battery" x="-11" y="-11" width="22" height="22"/>
+          <text class="flow-label" x="0" y="42" text-anchor="middle">Battery</text>
+          <text class="flow-value" x="0" y="-36" text-anchor="middle" id="node-batt-val">—</text>
+        </g>
+
+        <g class="flow-node" id="node-grid" transform="translate(590,182)">
+          <circle r="26"/>
+          <use href="#i-tower" x="-11" y="-11" width="22" height="22"/>
+          <text class="flow-label" x="0" y="42" text-anchor="middle">Grid</text>
+          <text class="flow-value" x="0" y="-36" text-anchor="middle" id="node-grid-val">—</text>
+        </g>
+      </svg>
+    </div>
+
+    <div class="section-title">Today's generation</div>
+    <div class="panel">
+      <svg id="chart-svg" viewBox="0 0 680 180" style="width:100%; height:auto; display:block;">
+        <line x1="0" y1="140" x2="680" y2="140" stroke="var(--line)" stroke-width="1"/>
+        <path id="chart-area" fill="var(--amber-dim)" stroke="none" opacity="0.6"/>
+        <path id="chart-line" fill="none" stroke="var(--amber)" stroke-width="2"/>
+      </svg>
+      <div style="display:flex; justify-content:space-between; font-size:11.5px; color:var(--text-faint); margin-top:6px;">
+        <span>6:00</span><span>9:00</span><span>12:00</span><span>15:00</span><span>18:00</span>
+      </div>
+    </div>
+
+    <div class="section-title">Station</div>
+    <div class="panel" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px,1fr)); gap:16px;">
+      <div><div class="lbl" style="font-size:12px;color:var(--text-muted);margin-bottom:5px;">Station</div><div id="st-name" class="mono" style="font-size:13px;">—</div></div>
+      <div><div class="lbl" style="font-size:12px;color:var(--text-muted);margin-bottom:5px;">Today</div><div id="st-today" class="mono" style="font-size:13px;">—</div></div>
+      <div><div class="lbl" style="font-size:12px;color:var(--text-muted);margin-bottom:5px;">This month</div><div id="st-month" class="mono" style="font-size:13px;">—</div></div>
+      <div><div class="lbl" style="font-size:12px;color:var(--text-muted);margin-bottom:5px;">Lifetime</div><div id="st-total" class="mono" style="font-size:13px;">—</div></div>
+      <div><div class="lbl" style="font-size:12px;color:var(--text-muted);margin-bottom:5px;">Last sync</div><div id="st-sync" class="mono" style="font-size:13px;">—</div></div>
+    </div>
+
+  </main>
+</div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/energy.js"></script>
+</body>
+</html>

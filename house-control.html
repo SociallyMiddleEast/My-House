@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>House control — Home Control</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="house-control">
+<div class="shell" id="shell">
+  <aside class="sidebar" id="sidebar-mount"></aside>
+  <main class="main">
+    <div class="topbar" id="topbar-mount"></div>
+
+    <div class="page-head">
+      <div>
+        <h1>House control</h1>
+        <div class="sub" id="hc-sub">—</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn small" id="hc-sync"><svg><use href="#i-refresh"/></svg>Sync status</button>
+        <div class="seg" id="floor-tabs">
+          <button class="seg-btn active" data-floor="1">First floor</button>
+          <button class="seg-btn" data-floor="2">Second floor</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="hc-demo-callout" class="callout teal hidden" style="margin-bottom:20px">
+      Devices below are local/demo — connect a platform on the <a href="connections.html">Connections</a> page to control real ones.
+    </div>
+
+    <div id="rooms-mount"></div>
+
+  </main>
+</div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/devices.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/house-control.js"></script>
+</body>
+</html>
