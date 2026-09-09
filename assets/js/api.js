@@ -246,6 +246,8 @@ function hcDemoUtilities() {
   const now = new Date();
   const hour = now.getHours() + now.getMinutes() / 60;
   const gridDown = hour % 6 < 1.2; // demo: a rotating ~1hr outage window
+  const gasPct = Math.max(6, Math.round(58 - (now.getDate() % 30) * 1.1));
+  const oilPct = Math.max(5, Math.round(71 - (now.getDate() % 45) * 1.0));
   return {
     generator: {
       running: gridDown,
@@ -254,6 +256,14 @@ function hcDemoUtilities() {
     },
     waterTank: {
       pct: Math.max(12, Math.round(64 + Math.sin(hour / 5) * 20))
+    },
+    gasTank: {
+      pct: gasPct,
+      daysLeft: Math.round(gasPct / 100 * 42) // demo: ~42 days on a full cylinder
+    },
+    fuelOil: {
+      pct: oilPct,
+      daysLeft: Math.round(oilPct / 100 * 95) // demo: ~95 days on a full heating tank
     }
   };
 }
