@@ -62,3 +62,50 @@ window.HC_DEVICES = [
   { id: 'office-plug',  floor: 2, room: 'Office',         name: 'Desk Plug',         platform: 'smartthings', type: 'plug',  state: { on: true } },
   { id: 'bath-light',   floor: 2, room: 'Bathroom',       name: 'Bathroom Light',    platform: 'tuya',        type: 'light', state: { on: false, brightness: 100 } }
 ];
+
+/* ==========================================================================
+   Scenes — one-tap presets applied to Overview's Quick scenes row. Each
+   scene is a rule keyed on device `type` (and optionally `room`), not a
+   fixed device-ID list, so adding/removing devices above doesn't require
+   touching these.
+   ========================================================================== */
+
+window.HC_SCENES = [
+  {
+    id: 'away',
+    label: 'Away',
+    icon: 'i-away',
+    blurb: 'Lights and plugs off, ACs to eco, vacuum cleans while out.',
+    ruleFor(d) {
+      if (d.type === 'light') return { on: false };
+      if (d.type === 'plug') return { on: false };
+      if (d.type === 'ac') return { on: true, temp: 26 };
+      if (d.type === 'vacuum') return { on: true };
+      return null;
+    }
+  },
+  {
+    id: 'goodnight',
+    label: 'Good night',
+    icon: 'i-moon',
+    blurb: 'Lights off, bedrooms cool to sleep temp, vacuum stays docked.',
+    ruleFor(d) {
+      if (d.type === 'light') return { on: false };
+      if (d.type === 'plug') return { on: false };
+      if (d.type === 'ac') return { on: true, temp: 23 };
+      if (d.type === 'vacuum') return { on: false };
+      return null;
+    }
+  },
+  {
+    id: 'movie',
+    label: 'Movie',
+    icon: 'i-bulb',
+    blurb: 'Living room dims low, every other light goes dark.',
+    ruleFor(d) {
+      if (d.type === 'light' && d.room === 'Living Room') return { on: true, brightness: 15 };
+      if (d.type === 'light') return { on: false };
+      return null;
+    }
+  }
+];
