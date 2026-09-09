@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pantry — Home Control</title>
-<script>(function(){try{var s=JSON.parse(localStorage.getItem('hc_settings_v1')||'{}');var t=s.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+<script>(function(){try{var s=JSON.parse(localStorage.getItem('hc_settings_v1')||'{}');var t=s.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}try{var a=JSON.parse(localStorage.getItem('hc_auth_v1')||'null');if(a&&a.enabled){var ok=sessionStorage.getItem('hc_session_ok')||localStorage.getItem('hc_session_ok');if(ok!=='1'){document.documentElement.setAttribute('data-authgate','locked');}}}catch(e){}})();</script>
 <link rel="stylesheet" href="assets/css/style.css">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -26,31 +26,9 @@
       </div>
     </div>
 
-    <div class="callout" style="border-left-color:var(--good); margin-bottom:20px;">
-      Lives in this browser by default — there's no supermarket or pharmacy API to sync from. Connect Google Sheets below if you want it shared across devices.
-    </div>
-
-    <div class="panel" id="sheets-panel" style="margin-bottom:20px;">
-      <div class="section-title" style="margin-top:0;">Google Sheets sync</div>
-      <p class="muted" style="font-size:13px; margin:0 0 14px;">
-        Optional — keeps Pantry (and Expenses, if you set that up too) in sync across every device by reading and writing a Sheet you control. The buttons below don't change; they'll just read from and write to this Sheet instead of only this browser. This page writes to a tab named exactly <strong>Pantry</strong> — create one (rename "Sheet1" to "Pantry" works fine) before connecting.
-        Setup is one-time in <a href="https://console.cloud.google.com" target="_blank" rel="noopener" style="color:var(--good);">Google Cloud Console</a>: enable the Sheets API, create an OAuth Client ID (type "Web application") with this site's URL under Authorized JavaScript origins, and add your own Google account as a test user on the OAuth consent screen — otherwise sign-in will be blocked. You'll see an "unverified app" warning when connecting; that's expected for a personal app.
-      </p>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-        <label class="field">
-          <span class="lbl">OAuth Client ID</span>
-          <input class="input" id="sh-client-id" placeholder="xxxx.apps.googleusercontent.com">
-        </label>
-        <label class="field">
-          <span class="lbl">Sheet ID</span>
-          <input class="input" id="sh-sheet-id" placeholder="from the sheet's URL, between /d/ and /edit">
-        </label>
-      </div>
-      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <button class="btn small" id="sh-save">Save</button>
-        <button class="btn small primary" id="sh-connect" style="background:var(--good); border-color:var(--good); color:#06210c;">Connect Google</button>
-        <span id="sh-status" class="status-pill hidden"></span>
-      </div>
+    <div class="callout" style="border-left-color:var(--good); margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+      <span>Lives in this browser by default. Connect Google Sheets in <a href="settings.html" style="color:var(--good);">Settings</a> to share it across devices.</span>
+      <span id="sh-status" class="status-pill hidden"></span>
     </div>
 
     <div id="pantry-form-panel" class="panel hidden" style="margin-bottom:20px;">
@@ -110,6 +88,7 @@
 <script src="assets/js/api.js"></script>
 <script src="assets/js/nav.js"></script>
 <script src="assets/js/sheets-sync.js"></script>
+<script src="assets/js/auth.js"></script>
 <script src="assets/js/pantry.js"></script>
 </body>
 </html>
