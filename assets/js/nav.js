@@ -30,6 +30,8 @@ const HC_ICON_SPRITE = `
 <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18h10a4 4 0 0 0 .5-7.97 5.5 5.5 0 0 0-10.6 1.5A3.5 3.5 0 0 0 7 18z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
 <symbol id="i-generator" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><polygon points="13,9.3 9.3,14.2 11.8,14.2 10.8,17.7 14.9,13 12.1,13" fill="currentColor"/></symbol>
 <symbol id="i-away" viewBox="0 0 24 24"><path d="M9 4.5H6A1.5 1.5 0 0 0 4.5 6v12A1.5 1.5 0 0 0 6 19.5h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M13 8.2l3.8 3.8-3.8 3.8M16.6 12H9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="i-gas" viewBox="0 0 24 24"><rect x="7" y="9" width="10" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9.5 9V6.5a2.5 2.5 0 0 1 5 0V9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="10.3" y1="4.3" x2="13.7" y2="4.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-barrel" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><line x1="5" y1="9.3" x2="19" y2="9.3" stroke="currentColor" stroke-width="1.4"/><line x1="5" y1="14.7" x2="19" y2="14.7" stroke="currentColor" stroke-width="1.4"/></symbol>
 </defs>
 </svg>`;
 
