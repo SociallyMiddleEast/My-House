@@ -1,102 +1,68 @@
-(function hcConnectionsPage() {
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connections — Home Control</title>
+<script>(function(){try{var s=JSON.parse(localStorage.getItem('hc_settings_v1')||'{}');var t=s.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body data-page="connections">
+<div class="shell" id="shell">
+  <aside class="sidebar" id="sidebar-mount"></aside>
+  <main class="main">
+    <div class="topbar" id="topbar-mount"></div>
 
-  const INTEGRATIONS = [
-    { key: 'deye', label: 'DeyeCloud', color: '#E8A33D', manual: false,
-      desc: 'Solar inverter monitoring — PV power, battery SOC, grid flow, and generation history for the Energy page.',
-      link: 'https://github.com/DeyeCloudDevelopers/deye-openapi-client-sample-code', linkLabel: 'DeyeCloud API sample code & docs' },
-    { key: 'tuya', label: 'Tuya', color: '#E8A33D', manual: false,
-      desc: 'Lights, plugs, and other Tuya-linked devices in House Control.',
-      link: 'https://iot.tuya.com', linkLabel: 'Tuya IoT Platform' },
-    { key: 'lg', label: 'LG ThinQ', color: '#E2604A', manual: false,
-      desc: 'LG air conditioners and appliances in House Control.',
-      link: 'https://smartsolution.developer.lge.com', linkLabel: 'LG Smart Solution API' },
-    { key: 'smartthings', label: 'SmartThings', color: '#4FA6E8', manual: false,
-      desc: 'Any device linked through a SmartThings account.',
-      link: 'https://developer.smartthings.com', linkLabel: 'SmartThings developer docs' },
-    { key: 'philips', label: 'Philips Coolhome', color: '#2E93A6', manual: true,
-      desc: 'Philips-branded air conditioners. Coolhome has no public developer API, so these tiles stay local — set them from the Coolhome app and mirror the state here if you want it reflected.' },
-    { key: 'eureka', label: 'Eureka', color: '#8862D6', manual: true,
-      desc: 'Eureka robot vacuums. Eureka has no public developer API, so this tile stays local — set it from the eureka robot app.' }
-  ];
+    <div class="page-head">
+      <div>
+        <h1>Connections</h1>
+        <div class="sub">This site never stores API secrets — only the backend proxy does.</div>
+      </div>
+    </div>
 
-  function cardMarkup(i, settings) {
-    const control = i.manual
-      ? `<span class="muted" style="font-size:12px; white-space:nowrap;">shown for reference</span>`
-      : `<button class="switch teal ${settings.services[i.key] ? 'on' : ''}" data-service="${i.key}" aria-label="Enable ${i.label}"></button>`;
-    return `
-      <div class="panel" style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px;">
-        <div>
-          <div style="display:flex; align-items:center; gap:8px; margin-bottom:5px;">
-            <span class="dot" style="background:${i.color}"></span>
-            <strong style="font-size:14px;">${i.label}</strong>
-            ${i.manual ? '<span class="badge">no public API</span>' : ''}
-          </div>
-          <div class="muted" style="font-size:13px; max-width:540px;">${i.desc}</div>
-          ${i.link ? `<a href="${i.link}" target="_blank" rel="noopener" style="font-size:12px; color:var(--teal); display:inline-block; margin-top:7px; text-decoration:underline;">${i.linkLabel}</a>` : ''}
+    <div class="callout" style="margin-bottom:22px">
+      DeyeCloud, Tuya, LG ThinQ, and SmartThings all require a signed, secret-holding request to fetch data or send commands — something a public GitHub Pages site cannot safely do on its own. This dashboard instead talks to a small backend proxy you deploy yourself (see <code>/server</code> in the project — Render, Railway, and Fly.io all have free tiers). The proxy holds your real API keys as environment variables; the browser only ever knows the proxy's URL.
+    </div>
+
+    <div class="section-title">Data source</div>
+    <div class="panel">
+      <label class="field">
+        <span class="lbl">Mode</span>
+        <div class="seg" id="mode-tabs">
+          <button class="seg-btn" data-mode="demo">Demo data</button>
+          <button class="seg-btn" data-mode="live">Live proxy</button>
         </div>
-        ${control}
-      </div>`;
-  }
+      </label>
 
-  function render() {
-    const s = hcLoadSettings();
-    document.querySelectorAll('#mode-tabs .seg-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === s.mode));
-    document.getElementById('proxy-url').value = s.proxyUrl;
-    document.getElementById('proxy-key').value = s.proxyKey;
-    document.getElementById('integrations-mount').innerHTML = INTEGRATIONS.map(i => cardMarkup(i, s)).join('');
-  }
+      <label class="field">
+        <span class="lbl">Proxy base URL</span>
+        <input class="input" id="proxy-url" placeholder="https://your-proxy.onrender.com">
+        <span class="hint">The deployed URL of the /server app in this project.</span>
+      </label>
 
-  function refreshSidebar() {
-    const mount = document.getElementById('sidebar-mount');
-    if (mount) mount.innerHTML = hcRenderSidebar('connections');
-  }
+      <label class="field">
+        <span class="lbl">Proxy access key <span class="muted" style="font-family:var(--font-body)">(optional but recommended)</span></span>
+        <input class="input" id="proxy-key" placeholder="matches PROXY_API_KEY on the server">
+        <span class="hint">Sent as the x-proxy-key header, so the proxy — which can control real devices — isn't open to the public internet.</span>
+      </label>
 
-  function currentFormValues() {
-    const activeMode = document.querySelector('#mode-tabs .seg-btn.active').dataset.mode;
-    return {
-      mode: activeMode,
-      proxyUrl: document.getElementById('proxy-url').value.trim(),
-      proxyKey: document.getElementById('proxy-key').value.trim()
-    };
-  }
+      <div style="display:flex; gap:10px; align-items:center; margin-top:4px;">
+        <button class="btn primary" id="conn-save"><svg><use href="#i-check"/></svg>Save</button>
+        <button class="btn" id="conn-test"><svg><use href="#i-refresh"/></svg>Test connection</button>
+        <span id="conn-test-result" class="status-pill hidden"></span>
+      </div>
+    </div>
 
-  document.getElementById('mode-tabs').addEventListener('click', (e) => {
-    const btn = e.target.closest('.seg-btn');
-    if (!btn) return;
-    document.querySelectorAll('#mode-tabs .seg-btn').forEach(b => b.classList.toggle('active', b === btn));
-  });
+    <div class="section-title">Integrations</div>
+    <div style="display:flex; flex-direction:column; gap:10px;" id="integrations-mount"></div>
 
-  document.getElementById('integrations-mount').addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-service]');
-    if (!btn) return;
-    const key = btn.dataset.service;
-    const s = hcLoadSettings();
-    const next = !s.services[key];
-    hcSaveSettings({ services: { [key]: next } });
-    btn.classList.toggle('on', next);
-    refreshSidebar();
-  });
+  </main>
+</div>
 
-  document.getElementById('conn-save').addEventListener('click', () => {
-    hcSaveSettings(currentFormValues());
-    refreshSidebar();
-    const btn = document.getElementById('conn-save');
-    const original = btn.innerHTML;
-    btn.innerHTML = `<svg><use href="#i-check"/></svg>Saved`;
-    setTimeout(() => { btn.innerHTML = original; }, 1300);
-  });
-
-  document.getElementById('conn-test').addEventListener('click', async () => {
-    hcSaveSettings(currentFormValues());
-    const pill = document.getElementById('conn-test-result');
-    pill.classList.remove('hidden');
-    pill.innerHTML = `<span class="dot"></span>Testing…`;
-    const result = await hcPingProxy();
-    pill.innerHTML = result.ok
-      ? `<span class="dot good"></span>Reachable`
-      : `<span class="dot bad"></span>${result.message}`;
-    refreshSidebar();
-  });
-
-  render();
-})();
+<script src="assets/js/config.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/devices.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/connections.js"></script>
+</body>
+</html>
