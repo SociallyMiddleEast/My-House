@@ -118,3 +118,63 @@ async function hcSendDeviceCommand(device, patch) {
     return { ok: false, local: false, message: err.message };
   }
 }
+
+/* ---------------------------- climate / sensors ---------------------------- */
+// Demo-only for now. When you've picked a real source for these — Tuya or
+// SmartThings temperature/humidity sensors, a ThinQ AC's ambient reading, a
+// weather API for outdoor — wire it up as its own hcGetClimate() branch the
+// same way hcGetEnergy() talks to DeyeCloud.
+
+function hcSparklinePath(values, w, h, pad) {
+  w = w || 56; h = h || 18; pad = pad || 2;
+  const min = Math.min(...values), max = Math.max(...values);
+  const range = (max - min) || 1;
+  const step = (w - pad * 2) / (values.length - 1);
+  return values.map((v, i) => {
+    const x = pad + i * step;
+    const y = pad + (h - pad * 2) * (1 - (v - min) / range);
+    return (i === 0 ? 'M' : 'L') + x.toFixed(1) + ',' + y.toFixed(1);
+  }).join(' ');
+}
+
+function hcTempSeries(base, amplitude, points) {
+  points = points || 8;
+  const arr = [];
+  for (let i = 0; i < points; i++) {
+    arr.push(+(base + Math.sin(i / 1.6) * amplitude + (Math.random() - 0.5) * 0.3).toFixed(1));
+  }
+  return arr;
+}
+
+function hcMinutesUntilNextClean() {
+  const now = new Date();
+  const scheduled = new Date(now);
+  scheduled.setHours(15, 0, 0, 0); // demo: a 3:00pm daily schedule
+  if (scheduled <= now) scheduled.setDate(scheduled.getDate() + 1);
+  return Math.round((scheduled - now) / 60000);
+}
+
+function hcDemoClimate() {
+  const now = new Date();
+  const hour = now.getHours() + now.getMinutes() / 60;
+  const outdoorBase = 21 + Math.sin((hour - 9) / 24 * 2 * Math.PI) * 6; // cool at night, warm mid-afternoon
+  const outdoor = hcTempSeries(outdoorBase, 0.8);
+  const living = hcTempSeries(23.5, 0.3);
+  const parents = hcTempSeries(22.2, 0.25);
+  const kids = hcTempSeries(23.0, 0.3);
+  const water = hcTempSeries(48, 1.2);
+
+  return {
+    outdoor: { label: 'Outdoor', value: outdoor[outdoor.length - 1], trend: outdoor, icon: 'i-sun' },
+    livingArea: { label: 'Living room', value: living[living.length - 1], trend: living, icon: 'i-house' },
+    parentsBedroom: { label: "Parents' bedroom", value: parents[parents.length - 1], trend: parents, icon: 'i-house' },
+    kidsBedroom: { label: "Kids' bedroom", value: kids[kids.length - 1], trend: kids, icon: 'i-house' },
+    hotWater: { label: 'Hot water', value: water[water.length - 1], trend: water, icon: 'i-droplet' },
+    vacuumMinutesToClean: hcMinutesUntilNextClean(),
+    updatedAt: now.toISOString()
+  };
+}
+
+async function hcGetClimate() {
+  return hcDemoClimate();
+}
