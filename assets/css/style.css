@@ -179,6 +179,7 @@ button, input, select {
 }
 
 .nav-item.active.teal { box-shadow: inset 2px 0 0 var(--teal); }
+.nav-item.active.green { box-shadow: inset 2px 0 0 var(--good); }
 
 .sidebar-foot {
   margin-top: auto;
@@ -587,11 +588,52 @@ label.field .hint {
 .activity-time { font-family: var(--font-mono); font-size: 11px; color: var(--text-faint); white-space: nowrap; min-width: 52px; }
 .activity-msg { color: var(--text); }
 
+/* ---------------------------------- pantry --------------------------------- */
+
+.pantry-category-title { display: flex; align-items: baseline; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--text); margin: 22px 0 10px; }
+.pantry-category-title:first-child { margin-top: 0; }
+.pantry-category-title .count { font-weight: 400; color: var(--text-faint); font-size: 12px; }
+
+.pantry-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  margin-bottom: 8px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.pantry-row .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.pantry-row .status-dot.ok { background: var(--good); }
+.pantry-row .status-dot.low { background: var(--amber); }
+.pantry-row .status-dot.out { background: var(--bad); }
+
+.pantry-row .name { flex: 1; min-width: 0; font-size: 13.5px; font-weight: 500; }
+
+.pantry-row .qty-stepper { display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 13px; white-space: nowrap; }
+.pantry-row .qty-stepper button { width: 22px; height: 22px; border-radius: 4px; border: 1px solid var(--line); background: var(--ink); color: var(--text); cursor: pointer; line-height: 1; }
+
+.pantry-row .expiry-badge { font-size: 11px; padding: 3px 8px; border-radius: 100px; border: 1px solid var(--line); color: var(--text-muted); white-space: nowrap; }
+.pantry-row .expiry-badge.urgent { color: var(--bad); border-color: var(--bad); }
+
+.pantry-row .row-actions { display: flex; gap: 4px; flex-shrink: 0; }
+.pantry-row .row-actions button { width: 26px; height: 26px; border-radius: 4px; border: 1px solid var(--line); background: none; color: var(--text-faint); cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.pantry-row .row-actions button:hover { color: var(--text); background: var(--panel-raised); }
+.pantry-row .row-actions svg { width: 13px; height: 13px; }
+
+@media (max-width: 560px) {
+  .pantry-row { flex-wrap: wrap; }
+  .pantry-row .name { flex-basis: 100%; }
+}
+
 /* ---------------------------------- reusable layout --------------------------------- */
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 16px;
 }
 
