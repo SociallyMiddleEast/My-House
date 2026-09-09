@@ -101,6 +101,24 @@ async function hcGetEnergy() {
   return hcDemoEnergy();
 }
 
+/* ---------------------------- devices (persisted, editable from House Control) ---------------------------- */
+
+const HC_DEVICES_KEY = 'hc_devices_v1';
+
+function hcLoadDevices() {
+  try {
+    const list = JSON.parse(localStorage.getItem(HC_DEVICES_KEY) || 'null');
+    if (list) return list;
+  } catch (e) { /* fall through to seed */ }
+  const seeded = JSON.parse(JSON.stringify(window.HC_DEVICE_SEED));
+  localStorage.setItem(HC_DEVICES_KEY, JSON.stringify(seeded));
+  return seeded;
+}
+
+function hcSaveDevices(list) {
+  localStorage.setItem(HC_DEVICES_KEY, JSON.stringify(list));
+}
+
 async function hcSendDeviceCommand(device, patch) {
   const platform = window.HC_PLATFORMS[device.platform];
   if (platform.manual || hcGetMode() === 'demo' || !hcServiceEnabled(device.platform)) {
@@ -310,9 +328,10 @@ function hcLogActivity(message) {
 async function hcApplyScene(sceneId) {
   const scene = window.HC_SCENES.find(s => s.id === sceneId);
   if (!scene) return;
+  const devices = hcLoadDevices();
   let changed = 0;
   const sends = [];
-  window.HC_DEVICES.forEach(d => {
+  devices.forEach(d => {
     const patch = scene.ruleFor(d);
     if (!patch) return;
     const isNoop = Object.entries(patch).every(([k, v]) => d.state[k] === v);
@@ -321,6 +340,7 @@ async function hcApplyScene(sceneId) {
     changed++;
     sends.push(hcSendDeviceCommand(d, patch));
   });
+  hcSaveDevices(devices);
   hcLogActivity(`${scene.label} scene applied — ${changed} device${changed === 1 ? '' : 's'} changed`);
   await Promise.all(sends);
   return changed;
