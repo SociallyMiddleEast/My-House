@@ -19,6 +19,7 @@
         <div class="sub" id="hc-sub">—</div>
       </div>
       <div class="page-actions">
+        <button class="btn small primary teal" id="hc-add-btn"><svg><use href="#i-check"/></svg>Add device</button>
         <button class="btn small" id="hc-sync"><svg><use href="#i-refresh"/></svg>Sync status</button>
         <div class="seg" id="floor-tabs">
           <button class="seg-btn active" data-floor="1">First floor</button>
@@ -29,6 +30,71 @@
 
     <div id="hc-demo-callout" class="callout teal hidden" style="margin-bottom:20px">
       Devices below are local/demo — connect a platform on the <a href="settings.html">Settings</a> page to control real ones.
+    </div>
+
+    <div id="device-form-panel" class="panel hidden" style="margin-bottom:20px;">
+      <div class="section-title" id="df-title" style="margin-top:0;">Add device</div>
+      <div style="display:grid; grid-template-columns:2fr 1fr; gap:12px;">
+        <label class="field">
+          <span class="lbl">Name</span>
+          <input class="input" id="df-name" placeholder="e.g. Kitchen Light">
+        </label>
+        <label class="field">
+          <span class="lbl">Floor</span>
+          <select class="input" id="df-floor">
+            <option value="1">First floor</option>
+            <option value="2">Second floor</option>
+          </select>
+        </label>
+      </div>
+      <label class="field">
+        <span class="lbl">Room</span>
+        <input class="input" id="df-room" list="df-room-options" placeholder="e.g. Kitchen">
+        <datalist id="df-room-options"></datalist>
+      </label>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <label class="field">
+          <span class="lbl">Type</span>
+          <select class="input" id="df-type">
+            <option value="ac">AC</option>
+            <option value="light">Light</option>
+            <option value="plug">Plug</option>
+            <option value="vacuum">Vacuum</option>
+          </select>
+        </label>
+        <label class="field">
+          <span class="lbl">Platform</span>
+          <select class="input" id="df-platform">
+            <option value="tuya">Tuya</option>
+            <option value="lg">LG ThinQ</option>
+            <option value="smartthings">SmartThings</option>
+            <option value="philips">Philips Coolhome</option>
+            <option value="eureka">Eureka</option>
+          </select>
+        </label>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+        <label class="field">
+          <span class="lbl">Starting state</span>
+          <select class="input" id="df-on">
+            <option value="false">Off</option>
+            <option value="true">On</option>
+          </select>
+        </label>
+        <label class="field hidden" id="df-temp-field">
+          <span class="lbl">Starting temp</span>
+          <input class="input" type="number" id="df-temp" value="23" min="16" max="30">
+        </label>
+        <label class="field hidden" id="df-brightness-field">
+          <span class="lbl">Starting brightness</span>
+          <input class="input" type="number" id="df-brightness" value="80" min="0" max="100">
+        </label>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn primary teal" id="df-save"><svg><use href="#i-check"/></svg>Save</button>
+        <button class="btn" id="df-cancel">Cancel</button>
+        <button class="btn danger hidden" id="df-delete" style="margin-left:auto;">Delete device</button>
+      </div>
     </div>
 
     <div id="rooms-mount"></div>
