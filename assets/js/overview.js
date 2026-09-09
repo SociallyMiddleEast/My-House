@@ -150,10 +150,37 @@
       </div>`;
   }
 
+  function fuelNote(pct, daysLeft) {
+    const low = pct < 20;
+    return `<div class="climate-note${low ? ' low' : ''}">${low ? 'Low — ' : '~'}${daysLeft} days left at current use</div>`;
+  }
+
+  function gasTile(gas) {
+    return `
+      <div class="climate-tile gas-tile">
+        <div class="climate-head"><svg><use href="#i-gas"/></svg>Gas tank</div>
+        <div class="climate-value">${gas.pct}<span class="climate-unit">%</span></div>
+        <div class="level-bar"><div class="level-bar-fill" style="width:${gas.pct}%"></div></div>
+        ${fuelNote(gas.pct, gas.daysLeft)}
+      </div>`;
+  }
+
+  function fuelOilTile(oil) {
+    return `
+      <div class="climate-tile oil-tile">
+        <div class="climate-head"><svg><use href="#i-barrel"/></svg>Fuel oil</div>
+        <div class="climate-value">${oil.pct}<span class="climate-unit">%</span></div>
+        <div class="level-bar"><div class="level-bar-fill" style="width:${oil.pct}%"></div></div>
+        ${fuelNote(oil.pct, oil.daysLeft)}
+      </div>`;
+  }
+
   async function renderUtilities(vacuumMinutes) {
     const u = hcDemoUtilities();
     document.getElementById('utilities-mount').innerHTML = [
       waterTankTile(u.waterTank),
+      gasTile(u.gasTank),
+      fuelOilTile(u.fuelOil),
       generatorTile(u.generator),
       vacuumTile(vacuumMinutes)
     ].join('');
