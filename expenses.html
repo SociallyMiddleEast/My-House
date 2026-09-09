@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Expenses — Home Control</title>
-<script>(function(){try{var s=JSON.parse(localStorage.getItem('hc_settings_v1')||'{}');var t=s.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+<script>(function(){try{var s=JSON.parse(localStorage.getItem('hc_settings_v1')||'{}');var t=s.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}try{var a=JSON.parse(localStorage.getItem('hc_auth_v1')||'null');if(a&&a.enabled){var ok=sessionStorage.getItem('hc_session_ok')||localStorage.getItem('hc_session_ok');if(ok!=='1'){document.documentElement.setAttribute('data-authgate','locked');}}}catch(e){}})();</script>
 <link rel="stylesheet" href="assets/css/style.css">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
@@ -26,30 +26,9 @@
       </div>
     </div>
 
-    <div class="callout" style="border-left-color:var(--indigo); margin-bottom:20px;">
-      Lives in this browser by default, same as Pantry. Connect Google Sheets below to share it across devices — one connection covers both pages.
-    </div>
-
-    <div class="panel" id="sheets-panel" style="margin-bottom:20px;">
-      <div class="section-title" style="margin-top:0;">Google Sheets sync</div>
-      <p class="muted" style="font-size:13px; margin:0 0 14px;">
-        This page writes to a tab named exactly <strong>Expenses</strong> in the same Sheet as Pantry — add that tab before connecting. If you've already connected on the Pantry page, the Client ID and Sheet ID below are already filled in; just click Connect Google here too (each page needs its own click since the sign-in isn't kept between page loads).
-      </p>
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
-        <label class="field">
-          <span class="lbl">OAuth Client ID</span>
-          <input class="input" id="sh-client-id" placeholder="xxxx.apps.googleusercontent.com">
-        </label>
-        <label class="field">
-          <span class="lbl">Sheet ID</span>
-          <input class="input" id="sh-sheet-id" placeholder="from the sheet's URL, between /d/ and /edit">
-        </label>
-      </div>
-      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
-        <button class="btn small" id="sh-save">Save</button>
-        <button class="btn small primary" id="sh-connect" style="background:var(--indigo); border-color:var(--indigo); color:#0E1330;">Connect Google</button>
-        <span id="sh-status" class="status-pill hidden"></span>
-      </div>
+    <div class="callout" style="border-left-color:var(--indigo); margin-bottom:20px; display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+      <span>Lives in this browser by default, same as Pantry. Connect Google Sheets in <a href="settings.html" style="color:var(--indigo);">Settings</a> to share it across devices.</span>
+      <span id="sh-status" class="status-pill hidden"></span>
     </div>
 
     <div id="expense-form-panel" class="panel hidden" style="margin-bottom:20px;">
@@ -111,6 +90,7 @@
 <script src="assets/js/api.js"></script>
 <script src="assets/js/nav.js"></script>
 <script src="assets/js/sheets-sync.js"></script>
+<script src="assets/js/auth.js"></script>
 <script src="assets/js/expenses.js"></script>
 </body>
 </html>
