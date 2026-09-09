@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pantry — Home Control</title>
+<script>(function(){try{var s=JSON.parse(localStorage.getItem('hc_settings_v1')||'{}');var t=s.theme||(matchMedia('(prefers-color-scheme: light)').matches?'light':'dark');document.documentElement.setAttribute('data-theme',t);}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+<link rel="stylesheet" href="assets/css/style.css">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body data-page="pantry">
+<div class="shell" id="shell">
+  <aside class="sidebar" id="sidebar-mount"></aside>
+  <main class="main">
+    <div class="topbar" id="topbar-mount"></div>
+
+    <div class="page-head">
+      <div>
+        <h1>Pantry</h1>
+        <div class="sub" id="pantry-sub">—</div>
+      </div>
+      <div class="page-actions">
+        <button class="btn small primary" id="pantry-add-btn" style="background:var(--good); border-color:var(--good); color:#06210c;">
+          <svg><use href="#i-check"/></svg>Add item
+        </button>
+      </div>
+    </div>
+
+    <div class="callout" style="border-left-color:var(--good); margin-bottom:20px;">
+      Lives in this browser by default — there's no supermarket or pharmacy API to sync from. Connect Google Sheets below if you want it shared across devices.
+    </div>
+
+    <div class="panel" id="sheets-panel" style="margin-bottom:20px;">
+      <div class="section-title" style="margin-top:0;">Google Sheets sync</div>
+      <p class="muted" style="font-size:13px; margin:0 0 14px;">
+        Optional — keeps Pantry in sync across every device by reading and writing a Sheet you control. The buttons below don't change; they'll just read from and write to this Sheet instead of only this browser.
+        Setup is one-time in <a href="https://console.cloud.google.com" target="_blank" rel="noopener" style="color:var(--good);">Google Cloud Console</a>: enable the Sheets API, create an OAuth Client ID (type "Web application") with this site's URL under Authorized JavaScript origins, and add your own Google account as a test user on the OAuth consent screen — otherwise sign-in will be blocked. You'll see an "unverified app" warning when connecting; that's expected for a personal app.
+      </p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <label class="field">
+          <span class="lbl">OAuth Client ID</span>
+          <input class="input" id="sh-client-id" placeholder="xxxx.apps.googleusercontent.com">
+        </label>
+        <label class="field">
+          <span class="lbl">Sheet ID</span>
+          <input class="input" id="sh-sheet-id" placeholder="from the sheet's URL, between /d/ and /edit">
+        </label>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <button class="btn small" id="sh-save">Save</button>
+        <button class="btn small primary" id="sh-connect" style="background:var(--good); border-color:var(--good); color:#06210c;">Connect Google</button>
+        <span id="sh-status" class="status-pill hidden"></span>
+      </div>
+    </div>
+
+    <div id="pantry-form-panel" class="panel hidden" style="margin-bottom:20px;">
+      <div class="section-title" id="pf-title" style="margin-top:0;">Add item</div>
+      <label class="field">
+        <span class="lbl">Name</span>
+        <input class="input" id="pf-name" placeholder="e.g. Milk, Paracetamol, Dish soap">
+      </label>
+      <label class="field">
+        <span class="lbl">Category</span>
+        <select class="input" id="pf-category">
+          <option value="groceries">Groceries</option>
+          <option value="household">Household</option>
+          <option value="medicine">Medicine</option>
+        </select>
+      </label>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+        <label class="field">
+          <span class="lbl">Quantity</span>
+          <input class="input" type="number" id="pf-qty" min="0" step="0.5" value="1">
+        </label>
+        <label class="field">
+          <span class="lbl">Unit</span>
+          <input class="input" id="pf-unit" placeholder="pcs, kg, L...">
+        </label>
+        <label class="field">
+          <span class="lbl">Low at</span>
+          <input class="input" type="number" id="pf-threshold" min="0" step="0.5" value="1">
+        </label>
+      </div>
+      <label class="field">
+        <span class="lbl">Expiry date <span class="muted" style="font-family:var(--font-body)">(optional — mainly useful for medicine)</span></span>
+        <input class="input" type="date" id="pf-expiry">
+      </label>
+      <div style="display:flex; gap:8px;">
+        <button class="btn primary" id="pf-save" style="background:var(--good); border-color:var(--good); color:#06210c;">Save</button>
+        <button class="btn" id="pf-cancel">Cancel</button>
+        <button class="btn danger hidden" id="pf-delete" style="margin-left:auto;">Delete item</button>
+      </div>
+    </div>
+
+    <div id="shopping-callout" class="callout hidden" style="border-left-color: var(--bad); margin-bottom:20px;"></div>
+
+    <div class="seg" id="pantry-tabs" style="margin-bottom:18px;">
+      <button class="seg-btn active" data-cat="all">All</button>
+      <button class="seg-btn" data-cat="groceries">Groceries</button>
+      <button class="seg-btn" data-cat="household">Household</button>
+      <button class="seg-btn" data-cat="medicine">Medicine</button>
+    </div>
+
+    <div id="pantry-list-mount"></div>
+
+  </main>
+</div>
+
+<script src="assets/js/config.js"></script>
+<script src="assets/js/api.js"></script>
+<script src="assets/js/nav.js"></script>
+<script src="assets/js/sheets-sync.js"></script>
+<script src="assets/js/pantry.js"></script>
+</body>
+</html>
