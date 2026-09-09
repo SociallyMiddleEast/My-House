@@ -32,13 +32,16 @@ const HC_ICON_SPRITE = `
 <symbol id="i-away" viewBox="0 0 24 24"><path d="M9 4.5H6A1.5 1.5 0 0 0 4.5 6v12A1.5 1.5 0 0 0 6 19.5h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path d="M13 8.2l3.8 3.8-3.8 3.8M16.6 12H9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-gas" viewBox="0 0 24 24"><rect x="7" y="9" width="10" height="12" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M9.5 9V6.5a2.5 2.5 0 0 1 5 0V9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><line x1="10.3" y1="4.3" x2="13.7" y2="4.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
 <symbol id="i-barrel" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><line x1="5" y1="9.3" x2="19" y2="9.3" stroke="currentColor" stroke-width="1.4"/><line x1="5" y1="14.7" x2="19" y2="14.7" stroke="currentColor" stroke-width="1.4"/></symbol>
+<symbol id="i-basket" viewBox="0 0 24 24"><path d="M4 9h16l-1.5 10a2 2 0 0 1-2 1.7H7.5a2 2 0 0 1-2-1.7L4 9z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 9V7a4 4 0 0 1 8 0v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24"><path d="M14.5 4.5l5 5L8.2 20.8H3.2v-5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
 </defs>
 </svg>`;
 
 const HC_NAV_ITEMS = [
   { id: 'overview',      href: 'index.html',          label: 'Overview',       icon: 'i-layout' },
-  { id: 'energy',        href: 'energy.html',         label: 'Energy',         icon: 'i-bolt',  accent: 'amber' },
-  { id: 'house-control', href: 'house-control.html',  label: 'House control',  icon: 'i-house', accent: 'teal' },
+  { id: 'energy',        href: 'energy.html',         label: 'Energy',         icon: 'i-bolt',   accent: 'amber' },
+  { id: 'house-control', href: 'house-control.html',  label: 'House control',  icon: 'i-house',  accent: 'teal' },
+  { id: 'pantry',        href: 'pantry.html',         label: 'Pantry',         icon: 'i-basket', accent: 'green' },
   { id: 'connections',   href: 'connections.html',    label: 'Connections',    icon: 'i-plug' }
 ];
 
@@ -66,7 +69,7 @@ function hcRenderSidebar(active) {
   const items = HC_NAV_ITEMS.map(item => {
     const isActive = item.id === active;
     const cls = ['nav-item'];
-    if (isActive) { cls.push('active'); if (item.accent === 'teal') cls.push('teal'); }
+    if (isActive) { cls.push('active'); if (item.accent && item.accent !== 'amber') cls.push(item.accent); }
     return `<a class="${cls.join(' ')}" href="${item.href}"><svg><use href="#${item.icon}"/></svg>${item.label}</a>`;
   }).join('');
 
