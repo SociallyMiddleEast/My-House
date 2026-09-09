@@ -34,6 +34,7 @@ const HC_ICON_SPRITE = `
 <symbol id="i-barrel" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.6"/><line x1="5" y1="9.3" x2="19" y2="9.3" stroke="currentColor" stroke-width="1.4"/><line x1="5" y1="14.7" x2="19" y2="14.7" stroke="currentColor" stroke-width="1.4"/></symbol>
 <symbol id="i-basket" viewBox="0 0 24 24"><path d="M4 9h16l-1.5 10a2 2 0 0 1-2 1.7H7.5a2 2 0 0 1-2-1.7L4 9z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M8 9V7a4 4 0 0 1 8 0v2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
 <symbol id="i-edit" viewBox="0 0 24 24"><path d="M14.5 4.5l5 5L8.2 20.8H3.2v-5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3 10h18" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="16.5" cy="14.3" r="1.3" fill="currentColor"/></symbol>
 </defs>
 </svg>`;
 
@@ -42,6 +43,7 @@ const HC_NAV_ITEMS = [
   { id: 'energy',        href: 'energy.html',         label: 'Energy',         icon: 'i-bolt',   accent: 'amber' },
   { id: 'house-control', href: 'house-control.html',  label: 'House control',  icon: 'i-house',  accent: 'teal' },
   { id: 'pantry',        href: 'pantry.html',         label: 'Pantry',         icon: 'i-basket', accent: 'green' },
+  { id: 'expenses',      href: 'expenses.html',       label: 'Expenses',       icon: 'i-wallet', accent: 'indigo' },
   { id: 'connections',   href: 'connections.html',    label: 'Connections',    icon: 'i-plug' }
 ];
 
