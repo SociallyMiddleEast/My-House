@@ -31,6 +31,10 @@
   --good:         #5FBF83;
   --bad:          #E2604A;
   --neutral:      #8B96A3;
+
+  /* Expenses domain accent */
+  --indigo:       #7B8FE0;
+  --indigo-dim:   #232A4A;
 }
 
 :root[data-theme="light"] {
@@ -58,6 +62,10 @@
   --good:         #1F9A57;
   --bad:          #C8432E;
   --neutral:      #59636F;
+
+  /* Expenses domain accent */
+  --indigo:       #4A5BC4;
+  --indigo-dim:   #E4E7FA;
 }
 
 :root {
@@ -180,6 +188,7 @@ button, input, select {
 
 .nav-item.active.teal { box-shadow: inset 2px 0 0 var(--teal); }
 .nav-item.active.green { box-shadow: inset 2px 0 0 var(--good); }
+.nav-item.active.indigo { box-shadow: inset 2px 0 0 var(--indigo); }
 
 .sidebar-foot {
   margin-top: auto;
@@ -627,6 +636,39 @@ label.field .hint {
 @media (max-width: 560px) {
   .pantry-row { flex-wrap: wrap; }
   .pantry-row .name { flex-basis: 100%; }
+}
+
+/* ---------------------------------- expenses --------------------------------- */
+
+.expense-month-title { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; font-size: 13.5px; font-weight: 600; color: var(--text); margin: 22px 0 10px; }
+.expense-month-title:first-child { margin-top: 0; }
+.expense-month-title .total { font-weight: 600; color: var(--indigo); font-family: var(--font-mono); font-size: 13px; }
+
+.expense-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: var(--panel);
+  margin-bottom: 8px;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.expense-row .expense-date { font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); white-space: nowrap; min-width: 52px; }
+.expense-row .expense-cat { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.expense-row .expense-note { flex: 1; min-width: 0; font-size: 13.5px; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.expense-row .expense-amount { font-family: var(--font-mono); font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+
+.category-bar-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; }
+.category-bar-row .cat-label { width: 100px; flex-shrink: 0; font-size: 12.5px; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
+.category-bar-row .level-bar { flex: 1; }
+.category-bar-row .cat-amount { width: 70px; flex-shrink: 0; text-align: right; font-family: var(--font-mono); font-size: 12px; color: var(--text-faint); }
+
+@media (max-width: 560px) {
+  .expense-row { flex-wrap: wrap; }
+  .expense-row .expense-note { flex-basis: 100%; order: 3; }
 }
 
 /* ---------------------------------- reusable layout --------------------------------- */
