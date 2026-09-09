@@ -32,13 +32,13 @@ window.HC_PLATFORMS = {
   },
   philips: {
     label: 'Philips Coolhome',
-    color: '#8FD0E0',
+    color: '#2E93A6',
     manual: true,
     note: 'Philips Coolhome has no public developer API. This tile is for reference — set it from the Coolhome app.'
   },
   eureka: {
     label: 'Eureka',
-    color: '#B48FE8',
+    color: '#8862D6',
     manual: true,
     note: 'Eureka has no public developer API. This tile is for reference — set it from the eureka robot app.'
   }
@@ -55,9 +55,9 @@ window.HC_DEVICES = [
   { id: 'entry-light',  floor: 1, room: 'Entrance',     name: 'Entrance Light',     platform: 'tuya',        type: 'light',  state: { on: true,  brightness: 45 } },
 
   // ---- Second floor ----
-  { id: 'master-ac',    floor: 2, room: 'Master Bedroom', name: 'Master Bedroom AC', platform: 'lg',          type: 'ac',    state: { on: true,  temp: 22 } },
-  { id: 'master-light', floor: 2, room: 'Master Bedroom', name: 'Bedside Lights',    platform: 'tuya',        type: 'light', state: { on: false, brightness: 30 } },
-  { id: 'guest-ac',     floor: 2, room: 'Guest Room',     name: 'Guest Room AC',     platform: 'philips',     type: 'ac',    state: { on: false, temp: 24 } },
+  { id: 'master-ac',    floor: 2, room: 'Parents Master Bedroom', name: 'Parents Bedroom AC', platform: 'lg',          type: 'ac',    state: { on: true,  temp: 22 } },
+  { id: 'master-light', floor: 2, room: 'Parents Master Bedroom', name: 'Bedside Lights',      platform: 'tuya',        type: 'light', state: { on: false, brightness: 30 } },
+  { id: 'guest-ac',     floor: 2, room: 'Kids Master Bedroom',    name: 'Kids Bedroom AC',      platform: 'philips',     type: 'ac',    state: { on: false, temp: 24 } },
   { id: 'office-light', floor: 2, room: 'Office',         name: 'Office Light',      platform: 'tuya',        type: 'light', state: { on: true,  brightness: 60 } },
   { id: 'office-plug',  floor: 2, room: 'Office',         name: 'Desk Plug',         platform: 'smartthings', type: 'plug',  state: { on: true } },
   { id: 'bath-light',   floor: 2, room: 'Bathroom',       name: 'Bathroom Light',    platform: 'tuya',        type: 'light', state: { on: false, brightness: 100 } }
