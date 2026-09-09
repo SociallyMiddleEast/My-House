@@ -149,6 +149,7 @@
     room: document.getElementById('df-room'),
     type: document.getElementById('df-type'),
     platform: document.getElementById('df-platform'),
+    id: document.getElementById('df-id'),
     on: document.getElementById('df-on'),
     temp: document.getElementById('df-temp'),
     brightness: document.getElementById('df-brightness')
@@ -174,6 +175,7 @@
     fields.room.value = d ? d.room : '';
     fields.type.value = d ? d.type : 'light';
     fields.platform.value = d ? d.platform : 'tuya';
+    fields.id.value = d ? d.id : '';
     fields.on.value = d ? String(!!d.state.on) : 'false';
     fields.temp.value = d && d.state.temp !== undefined ? d.state.temp : 23;
     fields.brightness.value = d && d.state.brightness !== undefined ? d.state.brightness : 80;
@@ -201,14 +203,16 @@
     if (type === 'ac') state.temp = Number(fields.temp.value) || 23;
     if (type === 'light') state.brightness = Number(fields.brightness.value) || 80;
 
+    const customId = fields.id.value.trim();
     const patch = { name, room, floor: Number(fields.floor.value), type, platform: fields.platform.value, state };
 
     if (editingId) {
       const d = findDevice(editingId);
+      if (customId && customId !== d.id) d.id = customId; // rename in place, refs are by object not by stale id
       Object.assign(d, patch);
       hcLogActivity(`Updated ${name} in House Control`);
     } else {
-      devices.push({ id: 'd' + Date.now(), ...patch });
+      devices.push({ id: customId || ('d' + Date.now()), ...patch });
       hcLogActivity(`Added ${name} to House Control`);
     }
     persist();
